@@ -1,0 +1,71 @@
+volumes:
+  subnet_api_server_local_postgres_data: {}
+  subnet_api_server_local_postgres_data_backups: {}
+  subnet_api_server_local_redis_data: {}
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: subnet_api_server_local_django
+    container_name: subnet_api_server_local_django
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - .:/app:z
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    ports:
+      - '8000:8000'
+    command: /start
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: subnet_api_server_production_postgres
+    container_name: subnet_api_server_local_postgres
+    volumes:
+      - subnet_api_server_local_postgres_data:/var/lib/postgresql/data
+      - subnet_api_server_local_postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.local/.postgres
+
+  redis:
+    image: docker.io/redis:6
+    container_name: subnet_api_server_local_redis
+    
+    volumes:
+      - subnet_api_server_local_redis_data:/data
+    
+
+  celeryworker:
+    <<: *django
+    image: subnet_api_server_local_celeryworker
+    container_name: subnet_api_server_local_celeryworker
+    depends_on:
+      - redis
+      - postgres
+    ports: []
+    command: /start-celeryworker
+
+  celerybeat:
+    <<: *django
+    image: subnet_api_server_local_celerybeat
+    container_name: subnet_api_server_local_celerybeat
+    depends_on:
+      - redis
+      - postgres
+    ports: []
+    command: /start-celerybeat
+
+  flower:
+    <<: *django
+    image: subnet_api_server_local_flower
+    container_name: subnet_api_server_local_flower
+    ports:
+      - '5555:5555'
+    command: /start-flower
