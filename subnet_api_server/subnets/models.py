@@ -14,13 +14,6 @@ class Crawl(Common):
     date_to = models.DateTimeField()
     warc_size = models.FloatField()
 
-    # Relationships
-    warc_files = models.ForeignKey(
-        "WarcFile",
-        related_name="crawls_rel",  # Rename to avoid conflict
-        on_delete=models.CASCADE,
-    )
-
     class Meta:
         db_table = "crawls"
 
@@ -40,7 +33,7 @@ class WarcFile(Common):
     )
 
     crawl = models.ForeignKey(
-        "Crawl",
+        Crawl,
         related_name="warc_files_rel",  # Rename to avoid conflict
         on_delete=models.CASCADE,
     )
@@ -54,13 +47,6 @@ class Neuron(Common):
     coldkey = models.CharField(max_length=255)
     uid = models.IntegerField()
 
-    # Relationships
-    task_records = models.ForeignKey(
-        "TaskRecord",
-        related_name="neurons_rel",  # Rename to avoid conflict
-        on_delete=models.CASCADE,
-    )
-
     class Meta:
         db_table = "neurons"
 
@@ -71,7 +57,7 @@ class TaskRecord(Common):
         related_name="task_records_rel",  # Rename to avoid conflict
         on_delete=models.CASCADE,
     )
-    warc_file_ids = models.JSONField()  # Django 3.1+ supports JSONField
+    warc_file_ids = models.JSONField()
     request_time = models.DateTimeField(default=timezone.now)
     status = models.CharField(
         max_length=20,

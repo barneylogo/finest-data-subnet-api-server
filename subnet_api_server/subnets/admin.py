@@ -16,7 +16,6 @@ class CrawlAdmin(admin.ModelAdmin):
         "date_from",
         "date_to",
         "warc_size",
-        "warc_files",
     )
     list_filter = ("date_from", "date_to")
     search_fields = ("name", "dump")
