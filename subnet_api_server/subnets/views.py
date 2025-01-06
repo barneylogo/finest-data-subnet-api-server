@@ -8,6 +8,7 @@ from subnet_api_server.common.models import StatusEnum
 from subnet_api_server.subnets.models import Neuron
 from subnet_api_server.subnets.models import TaskRecord
 from subnet_api_server.subnets.models import WarcFile
+from subnet_api_server.subnets.services import BittensorService
 from subnet_api_server.subnets.tasks import update_pending_tasks
 
 
@@ -28,13 +29,19 @@ class GetTaskViewSet(APIView):
                         {"detail": "Hotkey not found."},
                         status=status.HTTP_404_NOT_FOUND,
                     )
+
+                service = BittensorService(config=None)
+                config = service.get_config()
+
+                bittensor_service = BittensorService(config=config)
+
                 existing_task = TaskRecord.objects.filter(
                     neuron=neuron,
                     status=StatusEnum.pending.name,
                 ).first()
 
                 if existing_task:
-                    existing_task.request_time = timezone.now()
+                    existing_task.request_block = bittensor_service.get_current_block()
                     existing_task.save()
 
                     warc_files = WarcFile.objects.filter(
@@ -55,13 +62,13 @@ class GetTaskViewSet(APIView):
                         neuron=neuron,
                         status=StatusEnum.completed.name,
                     )
-                    .order_by("-request_time")
+                    .order_by("-request_block")
                     .first()
                 )
 
                 if (
                     last_completed_task
-                    and last_completed_task.request_time.date() == timezone.now().date()
+                    and last_completed_task.updated_at.date() == timezone.now().date()
                 ):
                     return Response(
                         {"detail": "You are limited to one task request per day"},
@@ -83,7 +90,7 @@ class GetTaskViewSet(APIView):
                 warc_file_ids = [wf.pk for wf in available_warc_files]
                 new_task = TaskRecord.objects.create(
                     neuron=neuron,
-                    request_time=timezone.now(),
+                    request_block=bittensor_service.get_current_block(),
                     status=StatusEnum.pending.name,
                     warc_file_ids=warc_file_ids,
                 )

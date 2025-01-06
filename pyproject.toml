@@ -81,6 +81,8 @@ ignore = [
   "S113",    # Ignore requests without timeouts
   "DTZ007",  # Ignore naive datetime construction without timezone
   "TRY300",  # Ignore suggestions to move return statements to an `else` block
+  "TRY003",
+  "EM101",
 ]
 
 [tool.ruff.isort]

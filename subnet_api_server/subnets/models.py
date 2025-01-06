@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 
 from subnet_api_server.common.models import Common
 from subnet_api_server.common.models import StatusEnum
@@ -58,7 +57,7 @@ class TaskRecord(Common):
         on_delete=models.CASCADE,
     )
     warc_file_ids = models.JSONField()
-    request_time = models.DateTimeField(default=timezone.now)
+    request_block = models.IntegerField(null=True, blank=True)
     status = models.CharField(
         max_length=20,
         choices=[

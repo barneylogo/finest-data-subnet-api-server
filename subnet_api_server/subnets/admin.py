@@ -55,7 +55,7 @@ class NeuronAdmin(admin.ModelAdmin):
 class TaskRecordAdmin(admin.ModelAdmin):
     list_display = (
         "neuron_hotkey",
-        "request_time",
+        "request_block",
         "status",
         "warc_file_ids",
         "created_at",
