@@ -70,6 +70,10 @@ select = [
   "PL", "TRY",   "RUF",
 ]
 ignore = [
+  "PLR0911",
+  "DTZ005",
+  "FBT003",
+  "T201",
   "S101",    # Use of assert detected
   "SIM102",  # Sometimes it's better to nest
   "UP038",   # Checks for uses of isinstance/issubclass that take a tuple

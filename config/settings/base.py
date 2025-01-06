@@ -85,6 +85,7 @@ LOCAL_APPS = [
     "subnet_api_server.users",
     "subnet_api_server.common",
     "subnet_api_server.subnets",
+    "django_celery_results",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -259,7 +260,7 @@ LOGGING = {
     "root": {"level": "INFO", "handlers": ["console"]},
 }
 
-REDIS_URL = env("REDIS_URL", default="redis://redis:6379/0")
+REDIS_URL = env("REDIS_URL", default="redis://localhost:6379/0")
 REDIS_SSL = REDIS_URL.startswith("rediss://")
 
 # Celery

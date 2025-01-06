@@ -26,7 +26,7 @@ class CrawlAdmin(admin.ModelAdmin):
 class WarcFileAdmin(admin.ModelAdmin):
     list_display = (
         "warc_path",
-        "crawl",
+        "crawl_dump",
         "size",
         "date",
         "last_modified",
@@ -39,6 +39,9 @@ class WarcFileAdmin(admin.ModelAdmin):
     search_fields = ("warc_path", "etag", "crawl__name")
     ordering = ("-created_at",)
 
+    def crawl_dump(self, obj):
+        return obj.crawl.dump
+
 
 @admin.register(Neuron)
 class NeuronAdmin(admin.ModelAdmin):
@@ -50,7 +53,21 @@ class NeuronAdmin(admin.ModelAdmin):
 # Admin customization for TaskRecord model
 @admin.register(TaskRecord)
 class TaskRecordAdmin(admin.ModelAdmin):
-    list_display = ("neuron", "request_time", "status", "created_at", "updated_at")
+    list_display = (
+        "neuron_hotkey",
+        "request_time",
+        "status",
+        "warc_file_ids",
+        "created_at",
+        "updated_at",
+    )
     list_filter = ("status", "created_at")
     search_fields = ("neuron__hotkey", "status")
     ordering = ("-created_at",)
+
+    @admin.display(
+        description="Neuron Hotkey",
+    )
+    def neuron_hotkey(self, obj):
+        hotkey = obj.neuron.hotkey
+        return f"{hotkey[:5]}...{hotkey[-5:]}"

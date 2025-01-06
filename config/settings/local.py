@@ -14,7 +14,7 @@ SECRET_KEY = env(
     default="DsAJo10ovYYbpNXnC7aNpD8P9wXDqRJLmkNEsTlzRq9aIo2k5IO1hNPEf3WtZR5u",
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]  # noqa: S104
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "168.100.174.232"]  # noqa: S104
 
 # CACHES
 # ------------------------------------------------------------------------------
@@ -30,7 +30,8 @@ CACHES = {
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_BACKEND = env(
-    "DJANGO_EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend",
+    "DJANGO_EMAIL_BACKEND",
+    default="django.core.mail.backends.console.EmailBackend",
 )
 
 # django-debug-toolbar
@@ -60,7 +61,9 @@ if env("USE_DOCKER") == "yes":
 # django-extensions
 # ------------------------------------------------------------------------------
 # https://django-extensions.readthedocs.io/en/latest/installation_instructions.html#configuration
-INSTALLED_APPS += ["django_extensions"]
+INSTALLED_APPS += [
+    "django_extensions",
+]
 # Celery
 # ------------------------------------------------------------------------------
 
