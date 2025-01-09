@@ -11,6 +11,22 @@ License: MIT
 
 Moved to [settings](https://cookiecutter-django.readthedocs.io/en/latest/1-getting-started/settings.html).
 
+## Installing Dependencies
+
+```bash
+pip install -r requirements/local.txt
+```
+
+```bash
+python manage.py migrate
+```
+
+## Running the server
+
+```bash
+python manage.py runserver
+```
+
 ## Basic Commands
 
 ### Setting Up Your Users
@@ -19,7 +35,9 @@ Moved to [settings](https://cookiecutter-django.readthedocs.io/en/latest/1-getti
 
 - To create a **superuser account**, use this command:
 
-      $ python manage.py createsuperuser
+```bash
+python manage.py createsuperuser
+```
 
 For convenience, you can keep your normal user logged in on Chrome and your superuser logged in on Firefox (or similar), so that you can see how the site behaves for both kinds of users.
 
