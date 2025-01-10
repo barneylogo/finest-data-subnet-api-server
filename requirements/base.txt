@@ -23,3 +23,13 @@ djangorestframework==3.15.2  # https://github.com/encode/django-rest-framework
 # Bittensor
 # ------------------------------------------------------------------------------
 bittensor
+
+# Spectacular
+# ------------------------------------------------------------------------------
+drf-spectacular==0.28.0  # https://github.com/tfranzel/drf-spectacular
+inflection==0.5.1  # https://github.com/jazzband/inflection
+jsonschema==4.23.0  # https://github.com/Julian/jsonschema
+jsonschema-specifications==2024.10.1  # https://github.com/Julian/jsonschema-specifications
+referencing==0.35.1  # https://github.com/Julian/referencing
+rpds-py==0.22.3  # https://github.com/jazzband/rpds-py
+uritemplate==4.1.1  # https://github.com/gruns/uritemplate.py
