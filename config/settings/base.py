@@ -324,5 +324,6 @@ SOCIALACCOUNT_ADAPTER = "subnet_api_server.users.adapters.SocialAccountAdapter"
 SOCIALACCOUNT_FORMS = {"signup": "subnet_api_server.users.forms.UserSocialSignupForm"}
 
 
-# Your stuff...
+# Bittensor
 # ------------------------------------------------------------------------------
+NETWORK = env("BITTENSOR_NETWORK", default="test")
