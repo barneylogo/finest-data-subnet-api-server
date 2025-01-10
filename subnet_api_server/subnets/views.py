@@ -134,3 +134,34 @@ class FinishTaskViewSet(APIView):
             return Response({"message": "Task finished"}, status=200)
         except Exception as e:
             return Response({"message": str(e)}, status=500)
+
+
+class CheckTaskViewSet(APIView):
+    def post(self, request):
+        try:
+            hotkey = request.data.get("hotkey")
+            if not hotkey:
+                return Response({"message": "Hotkey is required"}, status=400)
+
+            completed_task = (
+                TaskRecord.objects.filter(
+                    neuron__hotkey=hotkey,
+                    status=StatusEnum.completed.name,
+                )
+                .order_by("-updated_at")
+                .first()
+            )
+            if not completed_task:
+                return Response({"message": "Task not found"}, status=404)
+
+            warc_files = WarcFile.objects.filter(
+                pk__in=completed_task.warc_file_ids,
+            )
+            warc_paths = [wf.warc_path for wf in warc_files]
+
+            return Response(
+                {"message": "success", "warc_files": warc_paths},
+                status=200,
+            )
+        except Exception as e:
+            return Response({"message": str(e)}, status=500)
