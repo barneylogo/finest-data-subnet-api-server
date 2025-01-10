@@ -1,6 +1,6 @@
 # Translations for the subnet-api-server project
 # Copyright (C) 2024 Ben
-# Ben <ben@cerebromesh.io>, 2024.
+# Ben <ben@elevonix.io>, 2024.
 #
 #, fuzzy
 msgid ""
