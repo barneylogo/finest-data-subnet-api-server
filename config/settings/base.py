@@ -79,6 +79,7 @@ THIRD_PARTY_APPS = [
     "allauth.mfa",
     "allauth.socialaccount",
     "django_celery_beat",
+    "django_celery_results",
     "drf_spectacular",
 ]
 
@@ -86,7 +87,6 @@ LOCAL_APPS = [
     "subnet_api_server.users",
     "subnet_api_server.common",
     "subnet_api_server.subnets",
-    "django_celery_results",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
