@@ -81,6 +81,7 @@ THIRD_PARTY_APPS = [
     "django_celery_beat",
     "django_celery_results",
     "drf_spectacular",
+    "drf_yasg",
 ]
 
 LOCAL_APPS = [
@@ -327,15 +328,15 @@ SOCIALACCOUNT_FORMS = {"signup": "subnet_api_server.users.forms.UserSocialSignup
 
 # Bittensor
 # ------------------------------------------------------------------------------
-NETWORK = env("BITTENSOR_NETWORK", default="test")
-
+BITTENSOR_NETWORK = env("BITTENSOR_NETWORK", default="test")
+BITTENSOR_NETWORK_UID = env("BITTENSOR_NETWORK_UID", default=250)
 CORS_URLS_REGEX = r"^/api/.*$"
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
@@ -343,5 +344,5 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "Subnet API Server",
     "DESCRIPTION": "Documentation of API endpoints of Subnet API Server",
     "VERSION": "1.0.0",
-    "SERVE_PERMISSIONS": ["subnet_api_server.users.permissions.IsSuperuser"],
+    "SERVE_PERMISSIONS": [],
 }
