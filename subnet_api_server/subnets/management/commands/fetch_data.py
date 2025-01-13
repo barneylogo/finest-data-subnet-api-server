@@ -1,15 +1,15 @@
 # myapp/management/commands/fetch_data.py
-import argparse
 import gzip
 from datetime import datetime
 
-import bittensor as bt
 import requests
 from bs4 import BeautifulSoup
 from django.core.management.base import BaseCommand
-from subnets.models import Crawl
-from subnets.models import Neuron
-from subnets.models import WarcFile
+
+from subnet_api_server.common.services import BittensorService
+from subnet_api_server.subnets.models import Crawl
+from subnet_api_server.subnets.models import Neuron
+from subnet_api_server.subnets.models import WarcFile
 
 HTTP_OK = 200
 REQUEST_TIMEOUT = 30
@@ -22,6 +22,7 @@ class Command(BaseCommand):
         self.fetch_crawl()
         self.fetch_warc_files()
         self.fetch_neuron()
+        self.get_current_block()
 
     def fetch_crawl(self):
         url = "https://index.commoncrawl.org/collinfo.json"
@@ -116,9 +117,9 @@ class Command(BaseCommand):
 
     def fetch_neuron(self):
         try:
-            config = self.get_config()
-            subtensor = bt.subtensor(config=config)
-            metagraph = subtensor.metagraph(config.netuid)
+            config = BittensorService.get_config()
+            subtensor = BittensorService.get_subtensor()
+            metagraph = subtensor.metagraph(netuid=config.netuid)
 
             for uid in metagraph.uids:
                 hotkey = metagraph.hotkeys[uid]
@@ -132,24 +133,6 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(str(e))
 
-    def get_config(self):
-        # Add your Bittensor config logic here
-        # The rest of the method remains unchanged
-        parser = argparse.ArgumentParser(
-            description="Commit dataset to Bittensor subtensor chain.",
-        )
-        parser.add_argument(
-            "--netuid",
-            type=int,
-            default=250,
-            help="The unique identifier for the network",
-        )
-        parser.add_argument(
-            "--subtensor.network",
-            type=str,
-            default="test",
-            help="The unique identifier for the network",
-        )
-        bt.wallet.add_args(parser)
-        bt.subtensor.add_args(parser)
-        return bt.config(parser)
+    def get_current_block(self):
+        current_block = BittensorService.get_current_block()
+        print(current_block)

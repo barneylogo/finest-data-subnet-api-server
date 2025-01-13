@@ -83,6 +83,7 @@ ignore = [
   "TRY300",  # Ignore suggestions to move return statements to an `else` block
   "TRY003",
   "EM101",
+  "EM102",
 ]
 
 [tool.ruff.isort]

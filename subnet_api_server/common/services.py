@@ -2,12 +2,10 @@
 import argparse
 
 import bittensor as bt
-
-from config import settings
+from django.conf import settings
 
 
 class BittensorService:
-
     @staticmethod
     def get_config() -> bt.config:
         # Add your Bittensor config logic here
@@ -21,7 +19,7 @@ class BittensorService:
         parser.add_argument(
             "--netuid",
             type=int,
-            default=(250 if network == "test" else 0),
+            default=settings.BITTENSOR_NETWORK_UID,
             help="The unique identifier for the network",
         )
         parser.add_argument(
@@ -38,25 +36,24 @@ class BittensorService:
     @staticmethod
     def get_current_block() -> int:
         try:
-            config = BittensorService.get_config()
-            subtensor = bt.subtensor(config)
+            subtensor = BittensorService.get_subtensor()
             return subtensor.get_current_block()
         except Exception as e:
-            raise RuntimeError("Failed to get current block") from e
+            raise RuntimeError(f"Failed to get current block: {e}") from e
 
     @staticmethod
     def get_subtensor() -> bt.subtensor:
         try:
             config = BittensorService.get_config()
-            return bt.subtensor(config)
+            return bt.subtensor(network=settings.BITTENSOR_NETWORK, config=config)
         except Exception as e:
-            raise RuntimeError("Failed to get subtensor") from e
+            raise RuntimeError(f"Failed to get subtensor: {e}") from e
 
     @staticmethod
     def get_metagraph() -> bt.metagraph:
         try:
             config = BittensorService.get_config()
-            subtensor = bt.subtensor(config)
+            subtensor = BittensorService.get_subtensor()
             return subtensor.metagraph(netuid=config.netuid)
         except Exception as e:
-            raise RuntimeError("Failed to get metagraph") from e
+            raise RuntimeError(f"Failed to get metagraph: {e}") from e
