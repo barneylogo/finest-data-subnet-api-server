@@ -10,6 +10,7 @@ router = DefaultRouter() if settings.DEBUG else SimpleRouter()
 
 urls = [
     path("subnets/", include("subnet_api_server.subnets.urls")),
+    path("metagraph/", include("subnet_api_server.metagraph.urls")),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "docs/",
