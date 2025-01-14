@@ -1,4 +1,5 @@
 # ruff: noqa: E501
+
 from .base import *  # noqa: F403
 from .base import INSTALLED_APPS
 from .base import MIDDLEWARE
@@ -14,10 +15,7 @@ SECRET_KEY = env(
     default="DsAJo10ovYYbpNXnC7aNpD8P9wXDqRJLmkNEsTlzRq9aIo2k5IO1hNPEf3WtZR5u",
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list(
-    "DJANGO_ALLOWED_HOSTS",
-    default=["localhost", "127.0.0.1", "0.0.0.0"],
-)
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "168.100.174.232"]
 # CACHES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#caches
