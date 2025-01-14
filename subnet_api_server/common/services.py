@@ -85,3 +85,24 @@ class BittensorService:
             ]
         except Exception as e:
             raise RuntimeError(f"Failed to get neurons: {e}") from e
+
+    @staticmethod
+    def get_subnet_stats():
+        try:
+            metagraph = BittensorService.get_metagraph()
+            nodes = metagraph.neurons
+
+            total_nodes = len(nodes)
+            active_nodes = len([node for node in nodes if node.active])
+            inactive_nodes = total_nodes - active_nodes
+
+            total_stake = sum([node.stake.tao for node in nodes])
+
+            return {
+                "total_nodes": total_nodes,
+                "active_nodes": active_nodes,
+                "inactive_nodes": inactive_nodes,
+                "total_stake": total_stake,
+            }
+        except Exception as e:
+            raise RuntimeError(f"Failed to get subnet stats: {e}") from e
