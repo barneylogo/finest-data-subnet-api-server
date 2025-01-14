@@ -87,6 +87,36 @@ class BittensorService:
             raise RuntimeError(f"Failed to get neurons: {e}") from e
 
     @staticmethod
+    def get_validators() -> list:
+        try:
+            metagraph = BittensorService.get_metagraph()
+            return [
+                {
+                    "netuid": node.netuid,
+                    "uid": node.uid,
+                    "hotkey": node.hotkey,
+                    "coldkey": node.coldkey,
+                    "ip": node.prometheus_info.ip,
+                    "port": node.prometheus_info.port,
+                    "stake": node.stake.tao,
+                    "rank": node.rank,
+                    "emission": node.emission,
+                    "incentive": node.incentive,
+                    "consensus": node.consensus,
+                    "trust": node.trust,
+                    "validator_trust": node.validator_trust,
+                    "dividends": node.dividends,
+                    "validator_permit": node.validator_permit,
+                    "active": node.active,
+                    "last_update": node.last_update,
+                }
+                for node in metagraph.neurons
+                if node.validator_permit
+            ]
+        except Exception as e:
+            raise RuntimeError(f"Failed to get validators: {e}") from e
+
+    @staticmethod
     def get_subnet_stats():
         try:
             metagraph = BittensorService.get_metagraph()

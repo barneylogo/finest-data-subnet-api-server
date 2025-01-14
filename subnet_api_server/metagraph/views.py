@@ -19,6 +19,20 @@ class GetNodesView(APIView):
             )
 
 
+class GetValidatorsView(APIView):
+    def get(self, request):
+        try:
+            nodes = BittensorService.get_validators()
+            return Response(
+                {"validators": nodes, "total": len(nodes)},
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            return Response(
+                {"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
 class GetNodeByUidView(APIView):
     def get(self, request, uid):
         try:
