@@ -87,8 +87,8 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "subnet_api_server.users",
     "subnet_api_server.common",
-    "subnet_api_server.subnets",
     # Your stuff: custom apps go here
+    "subnet_api_server.subnets",
     "subnet_api_server.metagraph",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
