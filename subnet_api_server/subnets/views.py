@@ -9,6 +9,8 @@ from subnet_api_server.common.services import BittensorService
 from subnet_api_server.subnets.models import Neuron
 from subnet_api_server.subnets.models import TaskRecord
 from subnet_api_server.subnets.models import WarcFile
+from subnet_api_server.subnets.serielizers import CheckTaskSerializer
+from subnet_api_server.subnets.serielizers import GetTaskSerializer
 from subnet_api_server.subnets.tasks import update_pending_tasks
 
 
@@ -21,7 +23,6 @@ class GetTaskViewSet(APIView):
 
             with transaction.atomic():
                 update_pending_tasks.delay()
-
                 try:
                     neuron = Neuron.objects.get(hotkey=hotkey)
                 except Neuron.DoesNotExist:
@@ -41,13 +42,15 @@ class GetTaskViewSet(APIView):
                     )
                     warc_paths = [wf.warc_path for wf in warc_files]
 
-                    return Response(
+                    task_serializer = GetTaskSerializer(
                         {
                             "message": "You already have a pending task.",
                             "warc_paths": warc_paths,
                         },
-                        status=status.HTTP_200_OK,
                     )
+                    if task_serializer.is_valid():
+                        return Response(task_serializer.data, status=status.HTTP_200_OK)
+                    return Response({"message": "Invalid data"}, status=400)
 
                 last_completed_task = (
                     TaskRecord.objects.filter(
@@ -63,7 +66,7 @@ class GetTaskViewSet(APIView):
                     and last_completed_task.updated_at.date() == timezone.now().date()
                 ):
                     return Response(
-                        {"detail": "You are limited to one task request per day"},
+                        {"message": "You are limited to one task request per day"},
                         status=status.HTTP_400_BAD_REQUEST,
                     )
                 available_warc_files = WarcFile.objects.filter(
@@ -71,7 +74,7 @@ class GetTaskViewSet(APIView):
                 ).order_by("?")[:4]
                 if not available_warc_files:
                     return Response(
-                        {"detail": "No WARC files are currently available."},
+                        {"message": "No WARC files are currently available."},
                         status=status.HTTP_404_NOT_FOUND,
                     )
 
@@ -90,13 +93,14 @@ class GetTaskViewSet(APIView):
                 new_task.save()
 
                 warc_paths = [wf.warc_path for wf in available_warc_files]
-
-                return Response(
+                task_serializer = GetTaskSerializer(
                     {
                         "message": "success",
                         "warc_paths": warc_paths,
                     },
                 )
+                return Response(task_serializer.data, status=status.HTTP_200_OK)
+
         except Exception as e:
             return Response({"message": str(e)}, status=500)
 
@@ -105,6 +109,7 @@ class FinishTaskViewSet(APIView):
     def post(self, request):
         try:
             hotkey = request.data.get("hotkey")
+            hf_repo = request.data.get("hf_repo")
             if not hotkey:
                 return Response({"message": "Hotkey is required"}, status=400)
 
@@ -116,6 +121,7 @@ class FinishTaskViewSet(APIView):
                 return Response({"message": "Not found pending task"}, status=404)
 
             task.status = StatusEnum.completed.name
+            task.hf_repo = hf_repo
             task.save()
 
             for warc_file_id in task.warc_file_ids:
@@ -149,18 +155,16 @@ class CheckTaskViewSet(APIView):
                 )
                 warc_paths = [wf.warc_path for wf in warc_files]
 
-                return Response(
+                serializer = CheckTaskSerializer(
                     {
                         "message": "success",
                         "warc_files": warc_paths,
                         "request_block": completed_task.request_block,
                     },
-                    status=200,
                 )
+                return Response(serializer.data, status=200)
+
             return Response({"message": "Task not found"}, status=404)
 
-            # if not completed_task:
-
-            # return Response(
         except Exception as e:
             return Response({"message": str(e)}, status=500)

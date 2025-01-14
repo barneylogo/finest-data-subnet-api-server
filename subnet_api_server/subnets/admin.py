@@ -58,6 +58,7 @@ class TaskRecordAdmin(admin.ModelAdmin):
         "request_block",
         "status",
         "warc_file_ids",
+        "hf_repo",
         "created_at",
         "updated_at",
     )
