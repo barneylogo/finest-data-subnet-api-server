@@ -84,6 +84,8 @@ ignore = [
   "TRY003",
   "EM101",
   "EM102",
+  "S104",
+  "DJ001",
 ]
 
 [tool.ruff.isort]

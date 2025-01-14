@@ -105,6 +105,7 @@ class FinishTaskViewSet(APIView):
     def post(self, request):
         try:
             hotkey = request.data.get("hotkey")
+            hf_repo = request.data.get("hf_repo")
             if not hotkey:
                 return Response({"message": "Hotkey is required"}, status=400)
 
@@ -116,6 +117,7 @@ class FinishTaskViewSet(APIView):
                 return Response({"message": "Not found pending task"}, status=404)
 
             task.status = StatusEnum.completed.name
+            task.hf_repo = hf_repo
             task.save()
 
             for warc_file_id in task.warc_file_ids:
@@ -159,8 +161,5 @@ class CheckTaskViewSet(APIView):
                 )
             return Response({"message": "Task not found"}, status=404)
 
-            # if not completed_task:
-
-            # return Response(
         except Exception as e:
             return Response({"message": str(e)}, status=500)

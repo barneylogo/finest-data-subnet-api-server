@@ -65,6 +65,7 @@ class TaskRecord(Common):
         ],  # Correct choice tuple structure
         default=StatusEnum.pending.name,
     )
+    hf_repo = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         db_table = "task_records"
