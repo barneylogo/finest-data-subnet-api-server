@@ -9,8 +9,8 @@ from subnet_api_server.common.services import BittensorService
 from subnet_api_server.subnets.models import Neuron
 from subnet_api_server.subnets.models import TaskRecord
 from subnet_api_server.subnets.models import WarcFile
-from subnet_api_server.subnets.serielizers import CheckTaskSerializer
-from subnet_api_server.subnets.serielizers import GetTaskSerializer
+from subnet_api_server.subnets.serializers import CheckTaskSerializer
+from subnet_api_server.subnets.serializers import GetTaskSerializer
 from subnet_api_server.subnets.tasks import update_pending_tasks
 
 
