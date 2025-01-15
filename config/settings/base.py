@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 APPS_DIR = BASE_DIR / "subnet_api_server"
 env = environ.Env()
 
-READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
+READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=True)
 if READ_DOT_ENV_FILE:
     # OS environment variables take precedence over variables from .env
     env.read_env(str(BASE_DIR / ".env"))
@@ -79,13 +79,15 @@ THIRD_PARTY_APPS = [
     "allauth.mfa",
     "allauth.socialaccount",
     "django_celery_beat",
+    "django_celery_results",
+    "drf_spectacular",
+    "drf_yasg",
 ]
 
 LOCAL_APPS = [
     "subnet_api_server.users",
     "subnet_api_server.common",
     "subnet_api_server.subnets",
-    "django_celery_results",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -230,7 +232,7 @@ EMAIL_TIMEOUT = 5
 # Django Admin URL.
 ADMIN_URL = "admin/"
 # https://docs.djangoproject.com/en/dev/ref/settings/#admins
-ADMINS = [("""Ben""", "ben@cerebromesh.io")]
+ADMINS = [("""Tobias""", "tobias@elevonix.io")]
 # https://docs.djangoproject.com/en/dev/ref/settings/#managers
 MANAGERS = ADMINS
 # https://cookiecutter-django.readthedocs.io/en/latest/settings.html#other-environment-settings
@@ -324,5 +326,23 @@ SOCIALACCOUNT_ADAPTER = "subnet_api_server.users.adapters.SocialAccountAdapter"
 SOCIALACCOUNT_FORMS = {"signup": "subnet_api_server.users.forms.UserSocialSignupForm"}
 
 
-# Your stuff...
+# Bittensor
 # ------------------------------------------------------------------------------
+BITTENSOR_NETWORK = env("BITTENSOR_NETWORK", default="test")
+BITTENSOR_NETWORK_UID = env("BITTENSOR_NETWORK_UID", default=250)
+CORS_URLS_REGEX = r"^/api/.*$"
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.SessionAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Subnet API Server",
+    "DESCRIPTION": "Documentation of API endpoints of Subnet API Server",
+    "VERSION": "1.0.0",
+    "SERVE_PERMISSIONS": [],
+}

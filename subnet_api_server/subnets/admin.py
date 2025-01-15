@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import Crawl
 from .models import Neuron
+from .models import ScoreRecord
 from .models import TaskRecord
 from .models import WarcFile
 
@@ -58,6 +59,7 @@ class TaskRecordAdmin(admin.ModelAdmin):
         "request_block",
         "status",
         "warc_file_ids",
+        "hf_repo",
         "created_at",
         "updated_at",
     )
@@ -71,3 +73,30 @@ class TaskRecordAdmin(admin.ModelAdmin):
     def neuron_hotkey(self, obj):
         hotkey = obj.neuron.hotkey
         return f"{hotkey[:5]}...{hotkey[-5:]}"
+
+
+@admin.register(ScoreRecord)
+class ScoreRecordAdmin(admin.ModelAdmin):
+    list_display = (
+        "validator_hotkey",
+        "task_record_id",
+        "score",
+        "created_at",
+        "updated_at",
+    )
+    list_filter = ("created_at",)
+    search_fields = ("neuron__hotkey", "task_record__neuron__hotkey")
+    ordering = ("-created_at",)
+
+    @admin.display(
+        description="Validator Hotkey",
+    )
+    def validator_hotkey(self, obj):
+        hotkey = obj.neuron.hotkey
+        return f"{hotkey[:5]}...{hotkey[-5:]}"
+
+    @admin.display(
+        description="Task Record",
+    )
+    def task_record_id(self, obj):
+        return obj.task_record.id
