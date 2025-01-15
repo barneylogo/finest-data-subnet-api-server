@@ -69,3 +69,13 @@ class TaskRecord(Common):
 
     class Meta:
         db_table = "task_records"
+
+
+class ScoreRecord(Common):
+    neuron = models.ForeignKey(Neuron, on_delete=models.CASCADE)
+    task_record = models.ForeignKey(TaskRecord, on_delete=models.CASCADE)
+    score = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        db_table = "score_records"
+        unique_together = ("neuron", "task_record")
