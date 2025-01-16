@@ -92,21 +92,13 @@ class BittensorService:
             metagraph = BittensorService.get_metagraph()
             return [
                 {
-                    "netuid": node.netuid,
                     "uid": node.uid,
                     "hotkey": node.hotkey,
-                    "coldkey": node.coldkey,
-                    "ip": node.prometheus_info.ip,
-                    "port": node.prometheus_info.port,
                     "stake": node.stake.tao,
-                    "rank": node.rank,
-                    "emission": node.emission,
-                    "incentive": node.incentive,
-                    "consensus": node.consensus,
-                    "trust": node.trust,
                     "validator_trust": node.validator_trust,
-                    "dividends": node.dividends,
-                    "validator_permit": node.validator_permit,
+                    "rank": node.rank,
+                    "incentive": node.incentive,
+                    "emission": node.emission,
                     "active": node.active,
                     "last_update": node.last_update,
                 }
