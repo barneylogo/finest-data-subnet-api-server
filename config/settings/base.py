@@ -87,8 +87,9 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "subnet_api_server.users",
     "subnet_api_server.common",
-    "subnet_api_server.subnets",
     # Your stuff: custom apps go here
+    "subnet_api_server.subnets",
+    "subnet_api_server.metagraph",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -330,6 +331,9 @@ SOCIALACCOUNT_FORMS = {"signup": "subnet_api_server.users.forms.UserSocialSignup
 # ------------------------------------------------------------------------------
 BITTENSOR_NETWORK = env("BITTENSOR_NETWORK", default="test")
 BITTENSOR_NETWORK_UID = env("BITTENSOR_NETWORK_UID", default=250)
+
+# Documentation (Swagger)
+# ------------------------------------------------------------------------------
 CORS_URLS_REGEX = r"^/api/.*$"
 
 REST_FRAMEWORK = {
@@ -341,8 +345,8 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Subnet API Server",
-    "DESCRIPTION": "Documentation of API endpoints of Subnet API Server",
+    "TITLE": "Finesτ Daτa API Server",
+    "DESCRIPTION": "Documentation of API endpoints of Finesτ Daτa subnet by Elevonix Labs",
     "VERSION": "1.0.0",
     "SERVE_PERMISSIONS": [],
 }
