@@ -13,15 +13,15 @@ class GetTasksView(APIView):
             if count is not None:
                 count = int(count)
 
-            products = TaskRecord.objects.all().order_by("-created_at")
+            tasks = TaskRecord.objects.all().order_by("-created_at")
             if count:
-                products = products[:count]
-            serialized_products = TaskRecordSerializer(products, many=True).data
+                tasks = tasks[:count]
+            serialized_tasks = TaskRecordSerializer(tasks, many=True).data
 
             return Response(
                 {
-                    "total": len(serialized_products),
-                    "items": serialized_products,
+                    "total": len(serialized_tasks),
+                    "items": serialized_tasks,
                 },
                 status=status.HTTP_200_OK,
             )

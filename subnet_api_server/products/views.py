@@ -2,17 +2,23 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from subnet_api_server.common.services import BittensorService
+from subnet_api_server.products.serializers import ProductSerializer
 from subnet_api_server.subnets.models import Product
 
 
 class GetProductsView(APIView):
-    def get(self, request, count):
+    def get(self, request):
         try:
-            products = Product.objects.all()[:count]
+            count = request.query_params.get("count", 0)
+            if count is not None:
+                count = int(count)
+            products = Product.objects.all().order_by("-created_at")
+            if count:
+                products = products[:count]
+            serialized_products = ProductSerializer(products, many=True).data
 
             return Response(
-                {"total": len(products), "items": products},
+                {"total": len(serialized_products), "items": serialized_products},
                 status=status.HTTP_200_OK,
             )
         except Exception as e:
