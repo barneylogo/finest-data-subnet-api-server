@@ -37,6 +37,16 @@ class GetWeightsView(APIView):
                 .distinct("neuron")
             )
 
+            if len(miners) == 0 or len(validators) == 0:
+                return Response(
+                    {
+                        "validators": validator_uids,
+                        "miners": miners,
+                        "weights": weights,
+                    },
+                    status=status.HTTP_200_OK,
+                )
+
             # Get scores for the latest task records
             for task_record in latest_task_records:
                 miner_neuron = task_record.neuron
