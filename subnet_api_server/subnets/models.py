@@ -79,3 +79,21 @@ class ScoreRecord(Common):
     class Meta:
         db_table = "score_records"
         unique_together = ("neuron", "task_record")
+
+
+class Product(Common):
+    crawl = models.ForeignKey(
+        Crawl,
+        related_name="products",
+        on_delete=models.CASCADE,
+    )
+    hf_repo = models.CharField(max_length=255, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    published_at = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    rows = models.IntegerField()
+    tokens = models.IntegerField()
+
+    class Meta:
+        db_table = "products"
