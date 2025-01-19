@@ -2,23 +2,27 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from subnet_api_server.products.serializers import ProductSerializer
-from subnet_api_server.subnets.models import Product
+from subnet_api_server.subnets.models import TaskRecord
+from subnet_api_server.tasks.serializers import TaskRecordSerializer
 
 
-class GetProductsView(APIView):
+class GetTasksView(APIView):
     def get(self, request):
         try:
             count = request.query_params.get("count", 0)
             if count is not None:
                 count = int(count)
-            products = Product.objects.all().order_by("-created_at")
+
+            tasks = TaskRecord.objects.all().order_by("-created_at")
             if count:
-                products = products[:count]
-            serialized_products = ProductSerializer(products, many=True).data
+                tasks = tasks[:count]
+            serialized_tasks = TaskRecordSerializer(tasks, many=True).data
 
             return Response(
-                {"total": len(serialized_products), "items": serialized_products},
+                {
+                    "total": len(serialized_tasks),
+                    "items": serialized_tasks,
+                },
                 status=status.HTTP_200_OK,
             )
         except Exception as e:

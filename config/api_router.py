@@ -13,6 +13,7 @@ urls = [
     path("metagraph/", include("subnet_api_server.metagraph.urls")),
     path("stats/", include("subnet_api_server.stats.urls")),
     path("products/", include("subnet_api_server.products.urls")),
+    path("tasks/", include("subnet_api_server.tasks.urls")),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "docs/",
