@@ -331,6 +331,9 @@ SOCIALACCOUNT_FORMS = {"signup": "subnet_api_server.users.forms.UserSocialSignup
 # ------------------------------------------------------------------------------
 BITTENSOR_NETWORK = env("BITTENSOR_NETWORK", default="test")
 BITTENSOR_NETWORK_UID = env("BITTENSOR_NETWORK_UID", default=250)
+BITTENSOR_VALIDATOR_STAKE_THRESHOLD = env(
+    "BITTENSOR_VALIDATOR_STAKE_THRESHOLD", default=10
+)
 
 # Documentation (Swagger)
 # ------------------------------------------------------------------------------

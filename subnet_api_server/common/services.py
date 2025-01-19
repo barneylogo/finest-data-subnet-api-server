@@ -92,26 +92,36 @@ class BittensorService:
             metagraph = BittensorService.get_metagraph()
             return [
                 {
-                    "netuid": node.netuid,
                     "uid": node.uid,
                     "hotkey": node.hotkey,
-                    "coldkey": node.coldkey,
-                    "ip": node.prometheus_info.ip,
-                    "port": node.prometheus_info.port,
                     "stake": node.stake.tao,
-                    "rank": node.rank,
-                    "emission": node.emission,
-                    "incentive": node.incentive,
-                    "consensus": node.consensus,
-                    "trust": node.trust,
                     "validator_trust": node.validator_trust,
-                    "dividends": node.dividends,
-                    "validator_permit": node.validator_permit,
+                    "rank": node.rank,
+                    "incentive": node.incentive,
+                    "emission": node.emission,
                     "active": node.active,
                     "last_update": node.last_update,
                 }
                 for node in metagraph.neurons
                 if node.validator_permit
+                and node.validator_trust > 0
+                and node.stake.tao > settings.BITTENSOR_VALIDATOR_STAKE_THRESHOLD
+            ]
+        except Exception as e:
+            raise RuntimeError(f"Failed to get validators: {e}") from e
+
+    @staticmethod
+    def get_miners() -> list:
+        try:
+            metagraph = BittensorService.get_metagraph()
+            return [
+                {
+                    "uid": node.uid,
+                    "hotkey": node.hotkey,
+                    "incentive": node.incentive,
+                }
+                for node in metagraph.neurons
+                if node.trust > 0
             ]
         except Exception as e:
             raise RuntimeError(f"Failed to get validators: {e}") from e
