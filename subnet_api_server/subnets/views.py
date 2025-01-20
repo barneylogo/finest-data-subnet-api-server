@@ -207,12 +207,17 @@ class ReportScoreViewSet(APIView):
             task = TaskRecord.objects.get(pk=task_id)
             neuron = Neuron.objects.get(hotkey=hotkey)
 
-            score_record = ScoreRecord.objects.create(
+            # Check if a ScoreRecord already exists
+            score_record, created = ScoreRecord.objects.get_or_create(
                 neuron=neuron,
                 task_record=task,
-                score=score,
+                defaults={"score": score},
             )
-            score_record.save()
+
+            if not created:
+                # If the record exists, update the score
+                score_record.score = score
+                score_record.save()
 
             return Response({"message": "Score reported"}, status=200)
         except Exception as e:
