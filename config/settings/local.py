@@ -22,6 +22,12 @@ ALLOWED_HOSTS = [
     "0.0.0.0",
     "168.100.174.232",
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
 # CACHES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#caches

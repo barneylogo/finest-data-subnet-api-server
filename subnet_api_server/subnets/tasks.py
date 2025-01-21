@@ -1,27 +1,34 @@
-from datetime import datetime
+import logging
 from datetime import timedelta
 
 from celery import shared_task
+from django.utils import timezone
 
 from subnet_api_server.common.models import StatusEnum
 from subnet_api_server.subnets.models import TaskRecord
 from subnet_api_server.subnets.models import WarcFile
 
+logger = logging.getLogger(__name__)
+
 
 @shared_task
-def update_pending_tasks():
-    eight_hours_ago = datetime.now() - timedelta(hours=8)
-
-    pending_tasks = TaskRecord.objects.filter(
+def mark_stale_tasks_as_failed():
+    logger.info("Marking stale tasks as failed")
+    stale_time_limit = timezone.now() - timedelta(days=1)
+    stale_tasks = TaskRecord.objects.filter(
         status=StatusEnum.pending.name,
-        request_time__lte=eight_hours_ago,
+        created_at__lt=stale_time_limit,
     )
 
-    for task in pending_tasks:
-        pending_warc_files = WarcFile.objects.filter(id__in=task.warc_file_ids)
-        for warc_file in pending_warc_files:
-            warc_file.status = StatusEnum.available.name
-            warc_file.save()
+    if stale_tasks.count() > 0:
+        for task in stale_tasks:
+            task.status = StatusEnum.failed.name
+            task.save()
 
-        task.status = StatusEnum.failed.name
-        task.save()
+            warc_files = WarcFile.objects.filter(
+                pk__in=task.warc_file_ids,
+            )
+
+            for warc_file in warc_files:
+                warc_file.status = StatusEnum.available.name
+                warc_file.save()
