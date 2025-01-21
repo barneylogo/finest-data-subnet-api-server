@@ -13,7 +13,7 @@ class GetTasksView(APIView):
             if count is not None:
                 count = int(count)
 
-            tasks = TaskRecord.objects.all().order_by("-created_at")
+            tasks = TaskRecord.objects.select_related("neuron").all().order_by("-created_at")
             if count:
                 tasks = tasks[:count]
             serialized_tasks = TaskRecordSerializer(tasks, many=True).data
