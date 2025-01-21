@@ -82,6 +82,7 @@ THIRD_PARTY_APPS = [
     "django_celery_results",
     "drf_spectacular",
     "drf_yasg",
+    "corsheaders",
 ]
 
 LOCAL_APPS = [
@@ -146,6 +147,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
 ]
 
 # STATIC
@@ -332,7 +335,8 @@ SOCIALACCOUNT_FORMS = {"signup": "subnet_api_server.users.forms.UserSocialSignup
 BITTENSOR_NETWORK = env("BITTENSOR_NETWORK", default="test")
 BITTENSOR_NETWORK_UID = env("BITTENSOR_NETWORK_UID", default=250)
 BITTENSOR_VALIDATOR_STAKE_THRESHOLD = env(
-    "BITTENSOR_VALIDATOR_STAKE_THRESHOLD", default=10
+    "BITTENSOR_VALIDATOR_STAKE_THRESHOLD",
+    default=10,
 )
 
 # Documentation (Swagger)
