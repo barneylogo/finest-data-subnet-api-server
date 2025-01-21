@@ -18,7 +18,7 @@ crispy-bootstrap5==2024.10  # https://github.com/django-crispy-forms/crispy-boot
 django-redis==5.4.0  # https://github.com/jazzband/django-redis
 django-celery-results==2.5.1  # https://github.com/celery/django-celery-results
 djangorestframework==3.15.2  # https://github.com/encode/django-rest-framework
-
+django-celery-beat==2.7.0  # https://github.com/celery/django-celery-beat
 
 # Bittensor
 # ------------------------------------------------------------------------------
