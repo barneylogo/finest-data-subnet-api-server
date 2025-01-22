@@ -128,8 +128,6 @@ class FinishTaskViewSet(APIView):
             if not verify_signature(hotkey, message, signature):
                 return Response({"message": "Invalid signature"}, status=400)
 
-            print(hotkey, hf_repo, message, signature)
-
             task = TaskRecord.objects.get(
                 neuron__hotkey=hotkey,
                 status=StatusEnum.pending.name,
@@ -197,7 +195,7 @@ class ReportScoreViewSet(APIView):
             signature = request.data.get("signature")
             if not hotkey or not task_id or not score or not signature:
                 return Response(
-                    {"message": "Task ID, score, and signature are required"},
+                    {"message": "Hotkey, task ID, score, and signature are required"},
                     status=400,
                 )
 

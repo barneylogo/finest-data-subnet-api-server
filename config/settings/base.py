@@ -367,3 +367,13 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_PERMISSIONS": [],
 }
+
+# Bittensor
+# ------------------------------------------------------------------------------
+BITTENSOR_WALLET_DIR = env("BITTENSOR_WALLET_DIR", default="/app/.bittensor/wallets")
+BITTENSOR_NETWORK = env("BITTENSOR_NETWORK", default="test")
+BITTENSOR_NETWORK_UID = env("BITTENSOR_NETWORK_UID", default=250)
+BITTENSOR_VALIDATOR_STAKE_THRESHOLD = env(
+    "BITTENSOR_VALIDATOR_STAKE_THRESHOLD",
+    default=10,
+)
