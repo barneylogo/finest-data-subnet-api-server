@@ -58,7 +58,7 @@ class TaskRecordAdmin(admin.ModelAdmin):
         "neuron_hotkey",
         "request_block",
         "status",
-        "warc_file_ids",
+        "get_warc_file_ids",
         "hf_repo",
         "created_at",
         "updated_at",
@@ -73,6 +73,12 @@ class TaskRecordAdmin(admin.ModelAdmin):
     def neuron_hotkey(self, obj):
         hotkey = obj.neuron.hotkey
         return f"{hotkey[:5]}...{hotkey[-5:]}"
+    
+    @admin.display(
+        description="Warc File IDs",
+    )
+    def get_warc_file_ids(self, obj):
+        return ", ".join(str(warc_file.id) for warc_file in obj.warc_files.all())
 
 
 @admin.register(ScoreRecord)

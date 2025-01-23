@@ -56,7 +56,7 @@ class TaskRecord(Common):
         related_name="task_records_rel",  # Rename to avoid conflict
         on_delete=models.CASCADE,
     )
-    warc_file_ids = models.JSONField()
+    warc_files = models.ManyToManyField(WarcFile, related_name="task_records")
     request_block = models.IntegerField(null=True, blank=True)
     status = models.CharField(
         max_length=20,
