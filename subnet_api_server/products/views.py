@@ -6,8 +6,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from subnet_api_server.products.models import Product
 from subnet_api_server.products.serializers import ProductSerializer
-from subnet_api_server.subnets.models import Product
 
 
 class GetProductsView(APIView):
