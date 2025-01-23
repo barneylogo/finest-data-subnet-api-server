@@ -1,12 +1,30 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from drf_spectacular.utils import OpenApiExample
+from drf_spectacular.utils import OpenApiResponse
+from drf_spectacular.utils import OpenApiTypes
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from subnet_api_server.products.serializers import ProductSerializer
 from subnet_api_server.subnets.models import Product
 
 
 class GetProductsView(APIView):
+    @extend_schema(
+        description="Get all products.",
+        responses={
+            200: OpenApiResponse(
+                response=OpenApiTypes.OBJECT,
+                examples=[
+                    OpenApiExample(
+                        "Example Response",
+                        value={"total": 3, "items": [1, 2, 3]},
+                    ),
+                ],
+            ),
+        },
+    )
     def get(self, request):
         try:
             count = request.query_params.get("count", 0)
@@ -23,5 +41,6 @@ class GetProductsView(APIView):
             )
         except Exception as e:
             return Response(
-                {"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"message": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )

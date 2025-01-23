@@ -1,12 +1,32 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from drf_spectacular.utils import OpenApiExample
+from drf_spectacular.utils import OpenApiResponse
+from drf_spectacular.utils import OpenApiTypes
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from subnet_api_server.common.services import BittensorService
-from subnet_api_server.subnets.models import ScoreRecord, TaskRecord, Neuron
+from subnet_api_server.subnets.models import ScoreRecord
+from subnet_api_server.subnets.models import TaskRecord
 
 
 class GetValidatorsView(APIView):
+    @extend_schema(
+        description="Get all validators.",
+        responses={
+            200: OpenApiResponse(
+                response=OpenApiTypes.OBJECT,
+                examples=[
+                    OpenApiExample(
+                        "Example Response",
+                        value={"total": 3, "items": [1, 2, 3]},
+                        response_only=True,
+                    ),
+                ],
+            ),
+        },
+    )
     def get(self, request):
         try:
             nodes = BittensorService.get_validators()
@@ -16,11 +36,35 @@ class GetValidatorsView(APIView):
             )
         except Exception as e:
             return Response(
-                {"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"message": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
 
 class GetWeightsView(APIView):
+    @extend_schema(
+        description="Get all weights.",
+        responses={
+            200: OpenApiResponse(
+                response=OpenApiTypes.OBJECT,
+                examples=[
+                    OpenApiExample(
+                        "Example Response",
+                        value={
+                            "validators": [1, 2, 3],
+                            "miners": [1, 2, 3],
+                            "weights": {
+                                1: {1: 1, 2: 2, 3: 3},
+                                2: {1: 1, 2: 2, 3: 3},
+                                3: {1: 1, 2: 2, 3: 3},
+                            },
+                        },
+                        response_only=True,
+                    ),
+                ],
+            ),
+        },
+    )
     def get(self, request):
         try:
             miners = BittensorService.get_miners()
@@ -62,5 +106,6 @@ class GetWeightsView(APIView):
             )
         except Exception as e:
             return Response(
-                {"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"message": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
