@@ -105,6 +105,7 @@ class BittensorService:
                 for node in metagraph.neurons
                 if node.validator_permit
                 and node.validator_trust > 0
+                and node.dividends > 0
                 and node.stake.tao > settings.BITTENSOR_VALIDATOR_STAKE_THRESHOLD
             ]
         except Exception as e:
@@ -121,7 +122,7 @@ class BittensorService:
                     "incentive": node.incentive,
                 }
                 for node in metagraph.neurons
-                if node.trust > 0
+                if node.trust > 0 and node.incentive > 0
             ]
         except Exception as e:
             raise RuntimeError(f"Failed to get validators: {e}") from e
