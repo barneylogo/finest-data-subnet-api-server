@@ -38,11 +38,14 @@ class GetTaskViewSet(APIView):
             if not hotkey or not message or not signature:
                 return Response(
                     {"message": "Hotkey, message, and signature are required"},
-                    status=400,
+                    status=status.HTTP_404_NOT_FOUND,
                 )
 
             if not verify_signature(hotkey, message, signature):
-                return Response({"message": "Invalid signature"}, status=400)
+                return Response(
+                    {"message": "Invalid signature"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
             try:
                 neuron = Neuron.objects.get(hotkey=hotkey)
@@ -53,15 +56,17 @@ class GetTaskViewSet(APIView):
                     status=status.HTTP_404_NOT_FOUND,
                 )
 
-            existing_task = TaskRecord.objects.filter(
-                neuron=neuron,
-                status=StatusEnum.pending.name,
-            ).first()
+            existing_task = (
+                TaskRecord.objects.filter(
+                    neuron=neuron,
+                    status=StatusEnum.pending.name,
+                )
+                .order_by("-created_at")
+                .first()
+            )
 
             if existing_task:
-                warc_files = WarcFile.objects.filter(
-                    pk__in=existing_task.warc_file_ids,
-                )
+                warc_files = existing_task.warc_files.all()
                 warc_paths = [wf.warc_path for wf in warc_files]
 
                 task_serializer = GetTaskResponseSerializer(
@@ -87,7 +92,7 @@ class GetTaskViewSet(APIView):
             ):
                 return Response(
                     {"message": "You are limited to one task request per day"},
-                    status=status.HTTP_400_BAD_REQUEST,
+                    status=status.HTTP_404_NOT_FOUND,
                 )
             available_warc_files = WarcFile.objects.filter(
                 status=StatusEnum.available.name,
@@ -102,14 +107,14 @@ class GetTaskViewSet(APIView):
                 warc_file.status = StatusEnum.pending.name
                 warc_file.save()
 
-            warc_file_ids = [wf.pk for wf in available_warc_files]
+            [wf.pk for wf in available_warc_files]
             new_task = TaskRecord.objects.create(
                 neuron=neuron,
                 request_block=BittensorService.get_current_block(),
                 status=StatusEnum.pending.name,
-                warc_file_ids=warc_file_ids,
             )
 
+            new_task.warc_files.set(available_warc_files)
             new_task.save()
 
             warc_paths = [wf.warc_path for wf in available_warc_files]
