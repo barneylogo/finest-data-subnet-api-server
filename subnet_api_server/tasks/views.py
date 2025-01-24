@@ -30,7 +30,6 @@ class GetTasksView(APIView):
             if count:
                 tasks = tasks[:count]
             serialized_tasks = TaskRecordResponseSerializer(tasks, many=True).data
-
             return Response(
                 {
                     "total": len(serialized_tasks),
