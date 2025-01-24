@@ -66,7 +66,7 @@ class TaskRecordAdmin(admin.ModelAdmin):
     list_filter = ("status", "created_at")
     search_fields = ("neuron__hotkey", "status")
     ordering = ("-created_at",)
-    fields = ("neuron", "status", "warc_files", "request_block", "hf_repo")
+    fields = ("neuron", "status", "request_block", "hf_repo")
 
     @admin.display(
         description="Neuron Hotkey",

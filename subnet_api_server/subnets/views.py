@@ -150,32 +150,38 @@ class FinishTaskViewSet(APIView):
             if not hotkey or not hf_repo or not message or not signature:
                 return Response(
                     {"message": "Hotkey, hf_repo, message, and signature are required"},
-                    status=400,
+                    status=status.HTTP_404_NOT_FOUND,
                 )
 
             if not verify_signature(hotkey, message, signature):
-                return Response({"message": "Invalid signature"}, status=400)
+                return Response(
+                    {"message": "Invalid signature"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
-            task = TaskRecord.objects.filter(
+            pending_task = TaskRecord.objects.filter(
                 neuron__hotkey=hotkey,
                 status=StatusEnum.pending.name,
             ).first()
 
-            if not task:
-                return Response({"message": "Not found pending task"}, status=404)
+            if not pending_task:
+                return Response(
+                    {"message": "Not found pending task"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
-            task.status = StatusEnum.completed.name
-            task.hf_repo = hf_repo
-            task.save()
+            pending_task.status = StatusEnum.completed.name
+            pending_task.hf_repo = hf_repo
+            pending_task.save()
 
-            for warc_file_id in task.warc_file_ids:
-                warc_file = WarcFile.objects.get(pk=warc_file_id)
+            warc_files = pending_task.warc_files.all()
+            for warc_file in warc_files:
                 warc_file.status = StatusEnum.completed.name
                 warc_file.save()
 
-            return Response({"message": "Task finished"}, status=200)
+            return Response({"message": "Task finished"}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"message": str(e)}, status=500)
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CheckTaskViewSet(APIView):
@@ -189,10 +195,12 @@ class CheckTaskViewSet(APIView):
     def post(self, request):
         try:
             serializer = CheckTaskRequestSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
+            if not serializer.is_valid():
+                return Response(
+                    {"message": "Invalid request"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
             uid = serializer.validated_data.get("uid")
-            if not uid:
-                return Response({"message": "UID is required"}, status=400)
 
             completed_task = (
                 TaskRecord.objects.filter(
@@ -203,9 +211,8 @@ class CheckTaskViewSet(APIView):
                 .first()
             )
             if completed_task:
-                warc_files = WarcFile.objects.filter(
-                    pk__in=completed_task.warc_file_ids,
-                )
+                warc_files = completed_task.warc_files.all()
+
                 warc_paths = [wf.warc_path for wf in warc_files]
 
                 serializer = CheckTaskResponseSerializer(
@@ -216,12 +223,15 @@ class CheckTaskViewSet(APIView):
                         "request_block": completed_task.request_block,
                     },
                 )
-                return Response(serializer.data, status=200)
+                return Response(serializer.data, status=status.HTTP_200_OK)
 
-            return Response({"message": "Task not found"}, status=404)
+            return Response(
+                {"message": "Task not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         except Exception as e:
-            return Response({"message": str(e)}, status=500)
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ReportScoreViewSet(APIView):
@@ -243,7 +253,7 @@ class ReportScoreViewSet(APIView):
             if not hotkey or not task_id or not score or not signature:
                 return Response(
                     {"message": "Hotkey, task ID, score, and signature are required"},
-                    status=400,
+                    status=status.HTTP_404_NOT_FOUND,
                 )
 
             if not verify_signature(hotkey, str(task_id), signature):
