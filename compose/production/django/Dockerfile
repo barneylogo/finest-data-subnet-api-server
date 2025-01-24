@@ -1,6 +1,6 @@
 
 # define an alias for the specific python version used in this file.
-FROM docker.io/python:3.12.8-slim-bookworm AS python
+FROM docker.io/python:3.10.12-slim-bookworm AS python
 
 # Python build stage
 FROM python AS python-build-stage
@@ -38,7 +38,9 @@ WORKDIR ${APP_HOME}
 RUN addgroup --system django \
     && adduser --system --ingroup django django
 
+ENV HOME=/app
 
+RUN mkdir -p /app/.bittensor/wallets && chown -R django:django /app/.bittensor
 # Install required system dependencies
 RUN apt-get update && apt-get install --no-install-recommends -y \
   # psycopg dependencies

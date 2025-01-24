@@ -31,7 +31,7 @@ certificatesResolvers:
 http:
   routers:
     web-secure-router:
-      rule: 'Host(`elevonix.io`) || Host(`www.elevonix.io`)'
+      rule: 'Host(`finest-data-api.elevonix.io`)'
       entryPoints:
         - web-secure
       middlewares:
@@ -42,7 +42,7 @@ http:
         certResolver: letsencrypt
 
     flower-secure-router:
-      rule: 'Host(`elevonix.io`)'
+      rule: 'Host(`finest-data-api.elevonix.io`)'
       entryPoints:
         - flower
       service: flower

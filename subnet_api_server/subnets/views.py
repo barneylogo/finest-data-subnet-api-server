@@ -1,4 +1,5 @@
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,17 +10,30 @@ from subnet_api_server.subnets.models import Neuron
 from subnet_api_server.subnets.models import ScoreRecord
 from subnet_api_server.subnets.models import TaskRecord
 from subnet_api_server.subnets.models import WarcFile
-from subnet_api_server.subnets.serializers import CheckTaskSerializer
-from subnet_api_server.subnets.serializers import GetTaskSerializer
+from subnet_api_server.subnets.serializers import CheckTaskRequestSerializer
+from subnet_api_server.subnets.serializers import CheckTaskResponseSerializer
+from subnet_api_server.subnets.serializers import FinishTaskRequestSerializer
+from subnet_api_server.subnets.serializers import GetTaskRequestSerializer
+from subnet_api_server.subnets.serializers import GetTaskResponseSerializer
+from subnet_api_server.subnets.serializers import ReportScoreRequestSerializer
 from subnet_api_server.subnets.utils import verify_signature
 
 
 class GetTaskViewSet(APIView):
+    @extend_schema(
+        description="Get a task by hotkey.",
+        request=GetTaskRequestSerializer,
+        responses={
+            200: GetTaskResponseSerializer,
+        },
+    )
     def post(self, request):
         try:
-            hotkey = request.data.get("hotkey")
-            message = request.data.get("message")
-            signature = request.data.get("signature")
+            serializer = GetTaskRequestSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            hotkey = serializer.validated_data.get("hotkey")
+            message = serializer.validated_data.get("message")
+            signature = serializer.validated_data.get("signature")
 
             if not hotkey or not message or not signature:
                 return Response(
@@ -50,7 +64,7 @@ class GetTaskViewSet(APIView):
                 )
                 warc_paths = [wf.warc_path for wf in warc_files]
 
-                task_serializer = GetTaskSerializer(
+                task_serializer = GetTaskResponseSerializer(
                     {
                         "message": "You already have a pending task.",
                         "warc_paths": warc_paths,
@@ -99,7 +113,7 @@ class GetTaskViewSet(APIView):
             new_task.save()
 
             warc_paths = [wf.warc_path for wf in available_warc_files]
-            task_serializer = GetTaskSerializer(
+            task_serializer = GetTaskResponseSerializer(
                 {
                     "message": "success",
                     "warc_paths": warc_paths,
@@ -112,12 +126,21 @@ class GetTaskViewSet(APIView):
 
 
 class FinishTaskViewSet(APIView):
+    @extend_schema(
+        description="Finish a task by UID.",
+        request=FinishTaskRequestSerializer,
+        responses={
+            200: {"message": "Task finished"},
+        },
+    )
     def post(self, request):
         try:
-            hotkey = request.data.get("hotkey")
-            hf_repo = request.data.get("hf_repo")
-            message = request.data.get("message")
-            signature = request.data.get("signature")
+            serializer = FinishTaskRequestSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            hotkey = serializer.validated_data.get("hotkey")
+            hf_repo = serializer.validated_data.get("hf_repo")
+            message = serializer.validated_data.get("message")
+            signature = serializer.validated_data.get("signature")
 
             if not hotkey or not hf_repo or not message or not signature:
                 return Response(
@@ -128,12 +151,11 @@ class FinishTaskViewSet(APIView):
             if not verify_signature(hotkey, message, signature):
                 return Response({"message": "Invalid signature"}, status=400)
 
-            print(hotkey, hf_repo, message, signature)
-
-            task = TaskRecord.objects.get(
+            task = TaskRecord.objects.filter(
                 neuron__hotkey=hotkey,
                 status=StatusEnum.pending.name,
-            )
+            ).first()
+
             if not task:
                 return Response({"message": "Not found pending task"}, status=404)
 
@@ -152,9 +174,18 @@ class FinishTaskViewSet(APIView):
 
 
 class CheckTaskViewSet(APIView):
+    @extend_schema(
+        description="Check the status of a task by UID.",
+        request=CheckTaskRequestSerializer,
+        responses={
+            200: CheckTaskResponseSerializer,
+        },
+    )
     def post(self, request):
         try:
-            uid = request.data.get("uid")
+            serializer = CheckTaskRequestSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            uid = serializer.validated_data.get("uid")
             if not uid:
                 return Response({"message": "UID is required"}, status=400)
 
@@ -172,7 +203,7 @@ class CheckTaskViewSet(APIView):
                 )
                 warc_paths = [wf.warc_path for wf in warc_files]
 
-                serializer = CheckTaskSerializer(
+                serializer = CheckTaskResponseSerializer(
                     {
                         "message": "success",
                         "task_id": completed_task.id,
@@ -189,15 +220,24 @@ class CheckTaskViewSet(APIView):
 
 
 class ReportScoreViewSet(APIView):
+    @extend_schema(
+        description="Report the score of a task by UID.",
+        request=ReportScoreRequestSerializer,
+        responses={
+            200: {"message": "Score reported"},
+        },
+    )
     def post(self, request):
         try:
-            hotkey = request.data.get("hotkey")
-            task_id = request.data.get("task_id")
-            score = request.data.get("score")
-            signature = request.data.get("signature")
+            serializer = ReportScoreRequestSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            hotkey = serializer.validated_data.get("hotkey")
+            task_id = serializer.validated_data.get("task_id")
+            score = serializer.validated_data.get("score")
+            signature = serializer.validated_data.get("signature")
             if not hotkey or not task_id or not score or not signature:
                 return Response(
-                    {"message": "Task ID, score, and signature are required"},
+                    {"message": "Hotkey, task ID, score, and signature are required"},
                     status=400,
                 )
 
@@ -207,7 +247,6 @@ class ReportScoreViewSet(APIView):
             task = TaskRecord.objects.get(pk=task_id)
             neuron = Neuron.objects.get(hotkey=hotkey)
 
-            # Check if a ScoreRecord already exists
             score_record, created = ScoreRecord.objects.get_or_create(
                 neuron=neuron,
                 task_record=task,
@@ -215,7 +254,6 @@ class ReportScoreViewSet(APIView):
             )
 
             if not created:
-                # If the record exists, update the score
                 score_record.score = score
                 score_record.save()
 
