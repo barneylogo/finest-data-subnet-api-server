@@ -1,6 +1,6 @@
 import argparse
-import bittensor as bt
 
+import bittensor as bt
 from django.conf import settings
 
 
@@ -26,6 +26,12 @@ class BittensorService:
             type=str,
             default=network,
             help="The unique identifier for the network",
+        )
+        parser.add_argument(
+            "--wallet-path",
+            type=str,
+            default=settings.BITTENSOR_WALLET_DIR,
+            help="The directory to store the wallet",
         )
         bt.wallet.add_args(parser)
         bt.subtensor.add_args(parser)

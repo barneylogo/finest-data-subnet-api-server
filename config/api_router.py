@@ -2,6 +2,7 @@ from django.conf import settings
 from django.urls import include
 from django.urls import path
 from drf_spectacular.views import SpectacularAPIView
+from drf_spectacular.views import SpectacularRedocView
 from drf_spectacular.views import SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 from rest_framework.routers import SimpleRouter
@@ -18,7 +19,12 @@ urls = [
     path(
         "docs/",
         SpectacularSwaggerView.as_view(url_name="api:schema"),
-        name="swagger-ui",
+        name="docs",
+    ),
+    path(
+        "redoc/",
+        SpectacularRedocView.as_view(url_name="api:schema"),
+        name="redoc",
     ),
 ]
 

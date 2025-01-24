@@ -33,5 +33,3 @@ jsonschema-specifications==2024.10.1  # https://github.com/Julian/jsonschema-spe
 referencing==0.35.1  # https://github.com/Julian/referencing
 rpds-py==0.22.3  # https://github.com/jazzband/rpds-py
 uritemplate==4.1.1  # https://github.com/gruns/uritemplate.py
-drf-yasg==1.21.5  # https://github.com/axnsan12/drf-yasg
-django-cors-headers==4.6.0  # https://github.com/adamchainz/django-cors-headers

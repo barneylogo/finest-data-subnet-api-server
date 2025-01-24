@@ -4,6 +4,7 @@ module.exports = {
         name: 'django-server',
         script: 'python',
         args: 'manage.py runserver 0.0.0.0:8000',
+        watch: true,
       },
       {
         name: 'celery-worker',

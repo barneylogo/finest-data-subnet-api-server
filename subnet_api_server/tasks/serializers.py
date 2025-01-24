@@ -1,5 +1,4 @@
 from rest_framework import serializers
-
 from subnet_api_server.subnets.models import Neuron, ScoreRecord, TaskRecord, WarcFile
 
 class WarcFileSerializer(serializers.ModelSerializer):
@@ -12,13 +11,13 @@ class ScoreRecordSerializer(serializers.ModelSerializer):
         model = ScoreRecord
         fields = "__all__"
 
-
 class NeuronSerializer(serializers.ModelSerializer):
     class Meta:
         model = Neuron
         fields = "__all__"
 
-class TaskRecordSerializer(serializers.ModelSerializer):
+
+class TaskRecordResponseSerializer(serializers.ModelSerializer):
     neuron = NeuronSerializer(read_only=True)
     warc_files = WarcFileSerializer(many=True, read_only=True)
     score_records = ScoreRecordSerializer(many=True, read_only=True)
@@ -26,3 +25,7 @@ class TaskRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = TaskRecord
         fields = "__all__"
+
+
+class TaskRecordRequestSerializer(serializers.Serializer):
+    count = serializers.IntegerField(required=False)

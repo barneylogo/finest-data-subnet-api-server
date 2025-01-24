@@ -82,16 +82,15 @@ THIRD_PARTY_APPS = [
     "django_celery_beat",
     "django_celery_results",
     "drf_spectacular",
-    "drf_yasg",
     "corsheaders",
 ]
 
 LOCAL_APPS = [
     "subnet_api_server.users",
     "subnet_api_server.common",
-    # Your stuff: custom apps go here
     "subnet_api_server.subnets",
     "subnet_api_server.metagraph",
+    "subnet_api_server.products",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -367,4 +366,13 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_PERMISSIONS": [],
 }
- 
+
+# Bittensor
+# ------------------------------------------------------------------------------
+BITTENSOR_WALLET_DIR = env("BITTENSOR_WALLET_DIR", default="/app/.bittensor/wallets")
+BITTENSOR_NETWORK = env("BITTENSOR_NETWORK", default="test")
+BITTENSOR_NETWORK_UID = env("BITTENSOR_NETWORK_UID", default=250)
+BITTENSOR_VALIDATOR_STAKE_THRESHOLD = env(
+    "BITTENSOR_VALIDATOR_STAKE_THRESHOLD",
+    default=10,
+)
