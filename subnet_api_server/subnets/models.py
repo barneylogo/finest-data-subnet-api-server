@@ -67,6 +67,12 @@ class TaskRecord(Common):
     )
     hf_repo = models.CharField(max_length=255, null=True, blank=True)
 
+    score_records = models.ManyToManyField(
+        'ScoreRecord',
+        related_name='task_records',
+        blank=True
+    )
+
     class Meta:
         db_table = "task_records"
 
