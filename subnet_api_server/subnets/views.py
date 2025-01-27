@@ -38,11 +38,14 @@ class GetTaskViewSet(APIView):
             if not hotkey or not message or not signature:
                 return Response(
                     {"message": "Hotkey, message, and signature are required"},
-                    status=400,
+                    status=status.HTTP_404_NOT_FOUND,
                 )
 
             if not verify_signature(hotkey, message, signature):
-                return Response({"message": "Invalid signature"}, status=400)
+                return Response(
+                    {"message": "Invalid signature"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
             try:
                 neuron = Neuron.objects.get(hotkey=hotkey)
@@ -53,15 +56,17 @@ class GetTaskViewSet(APIView):
                     status=status.HTTP_404_NOT_FOUND,
                 )
 
-            existing_task = TaskRecord.objects.filter(
-                neuron=neuron,
-                status=StatusEnum.pending.name,
-            ).first()
+            existing_task = (
+                TaskRecord.objects.filter(
+                    miner=neuron,
+                    status=StatusEnum.pending.name,
+                )
+                .order_by("-created_at")
+                .first()
+            )
 
             if existing_task:
-                warc_files = WarcFile.objects.filter(
-                    pk__in=existing_task.warc_file_ids,
-                )
+                warc_files = existing_task.warc_files.all()
                 warc_paths = [wf.warc_path for wf in warc_files]
 
                 task_serializer = GetTaskResponseSerializer(
@@ -74,7 +79,7 @@ class GetTaskViewSet(APIView):
 
             last_completed_task = (
                 TaskRecord.objects.filter(
-                    neuron=neuron,
+                    miner=neuron,
                     status=StatusEnum.completed.name,
                 )
                 .order_by("-request_block")
@@ -87,8 +92,9 @@ class GetTaskViewSet(APIView):
             ):
                 return Response(
                     {"message": "You are limited to one task request per day"},
-                    status=status.HTTP_400_BAD_REQUEST,
+                    status=status.HTTP_404_NOT_FOUND,
                 )
+
             available_warc_files = WarcFile.objects.filter(
                 status=StatusEnum.available.name,
             ).order_by("?")[:4]
@@ -102,14 +108,14 @@ class GetTaskViewSet(APIView):
                 warc_file.status = StatusEnum.pending.name
                 warc_file.save()
 
-            warc_file_ids = [wf.pk for wf in available_warc_files]
+            [wf.pk for wf in available_warc_files]
             new_task = TaskRecord.objects.create(
-                neuron=neuron,
+                miner=neuron,
                 request_block=BittensorService.get_current_block(),
                 status=StatusEnum.pending.name,
-                warc_file_ids=warc_file_ids,
             )
 
+            new_task.warc_files.set(available_warc_files)
             new_task.save()
 
             warc_paths = [wf.warc_path for wf in available_warc_files]
@@ -145,32 +151,38 @@ class FinishTaskViewSet(APIView):
             if not hotkey or not hf_repo or not message or not signature:
                 return Response(
                     {"message": "Hotkey, hf_repo, message, and signature are required"},
-                    status=400,
+                    status=status.HTTP_404_NOT_FOUND,
                 )
 
             if not verify_signature(hotkey, message, signature):
-                return Response({"message": "Invalid signature"}, status=400)
+                return Response(
+                    {"message": "Invalid signature"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
-            task = TaskRecord.objects.filter(
-                neuron__hotkey=hotkey,
+            pending_task = TaskRecord.objects.filter(
+                miner__hotkey=hotkey,
                 status=StatusEnum.pending.name,
             ).first()
 
-            if not task:
-                return Response({"message": "Not found pending task"}, status=404)
+            if not pending_task:
+                return Response(
+                    {"message": "Not found pending task"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
-            task.status = StatusEnum.completed.name
-            task.hf_repo = hf_repo
-            task.save()
+            pending_task.status = StatusEnum.completed.name
+            pending_task.hf_repo = hf_repo
+            pending_task.save()
 
-            for warc_file_id in task.warc_file_ids:
-                warc_file = WarcFile.objects.get(pk=warc_file_id)
+            warc_files = pending_task.warc_files.all()
+            for warc_file in warc_files:
                 warc_file.status = StatusEnum.completed.name
                 warc_file.save()
 
-            return Response({"message": "Task finished"}, status=200)
+            return Response({"message": "Task finished"}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"message": str(e)}, status=500)
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CheckTaskViewSet(APIView):
@@ -184,23 +196,24 @@ class CheckTaskViewSet(APIView):
     def post(self, request):
         try:
             serializer = CheckTaskRequestSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
+            if not serializer.is_valid():
+                return Response(
+                    {"message": "Invalid request"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
             uid = serializer.validated_data.get("uid")
-            if not uid:
-                return Response({"message": "UID is required"}, status=400)
 
             completed_task = (
                 TaskRecord.objects.filter(
-                    neuron__uid=uid,
+                    miner__uid=uid,
                     status=StatusEnum.completed.name,
                 )
                 .order_by("-updated_at")
                 .first()
             )
             if completed_task:
-                warc_files = WarcFile.objects.filter(
-                    pk__in=completed_task.warc_file_ids,
-                )
+                warc_files = completed_task.warc_files.all()
+
                 warc_paths = [wf.warc_path for wf in warc_files]
 
                 serializer = CheckTaskResponseSerializer(
@@ -211,12 +224,15 @@ class CheckTaskViewSet(APIView):
                         "request_block": completed_task.request_block,
                     },
                 )
-                return Response(serializer.data, status=200)
+                return Response(serializer.data, status=status.HTTP_200_OK)
 
-            return Response({"message": "Task not found"}, status=404)
+            return Response(
+                {"message": "Task not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         except Exception as e:
-            return Response({"message": str(e)}, status=500)
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ReportScoreViewSet(APIView):
@@ -238,7 +254,7 @@ class ReportScoreViewSet(APIView):
             if not hotkey or not task_id or not score or not signature:
                 return Response(
                     {"message": "Hotkey, task ID, score, and signature are required"},
-                    status=400,
+                    status=status.HTTP_404_NOT_FOUND,
                 )
 
             if not verify_signature(hotkey, str(task_id), signature):
@@ -248,7 +264,7 @@ class ReportScoreViewSet(APIView):
             neuron = Neuron.objects.get(hotkey=hotkey)
 
             score_record, created = ScoreRecord.objects.get_or_create(
-                neuron=neuron,
+                validator=neuron,
                 task_record=task,
                 defaults={"score": score},
             )

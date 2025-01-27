@@ -51,7 +51,7 @@ class Neuron(Common):
 
 
 class TaskRecord(Common):
-    neuron = models.ForeignKey(
+    miner = models.ForeignKey(
         Neuron,
         related_name="task_records_rel",  # Rename to avoid conflict
         on_delete=models.CASCADE,
@@ -65,23 +65,18 @@ class TaskRecord(Common):
         ],  # Correct choice tuple structure
         default=StatusEnum.pending.name,
     )
-    hf_repo = models.CharField(max_length=255, null=True, blank=True)
 
-    score_records = models.ManyToManyField(
-        'ScoreRecord',
-        related_name='task_records',
-        blank=True
-    )
+    hf_repo = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         db_table = "task_records"
 
 
 class ScoreRecord(Common):
-    neuron = models.ForeignKey(Neuron, on_delete=models.CASCADE)
+    validator = models.ForeignKey(Neuron, on_delete=models.CASCADE)
     task_record = models.ForeignKey(TaskRecord, on_delete=models.CASCADE)
     score = models.FloatField(blank=True, null=True)
 
     class Meta:
         db_table = "score_records"
-        unique_together = ("neuron", "task_record")
+        unique_together = ("validator", "task_record")

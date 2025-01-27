@@ -55,40 +55,33 @@ class NeuronAdmin(admin.ModelAdmin):
 @admin.register(TaskRecord)
 class TaskRecordAdmin(admin.ModelAdmin):
     list_display = (
-        "neuron_hotkey",
+        "miner_hotkey",
         "request_block",
         "status",
         "get_warc_files",
-        "get_score_records",
         "hf_repo",
         "created_at",
         "updated_at",
     )
     list_filter = ("status", "created_at")
-    search_fields = ("neuron__hotkey", "status")
+    search_fields = ("miner__hotkey", "status")
     ordering = ("-created_at",)
+    fields = ("miner", "status", "request_block", "hf_repo")
 
     @admin.display(
-        description="Neuron Hotkey",
+        description="Miner Hotkey",
     )
-    def neuron_hotkey(self, obj):
-        hotkey = obj.neuron.hotkey
+    def miner_hotkey(self, obj):
+        hotkey = obj.miner.hotkey
         return f"{hotkey[:5]}...{hotkey[-5:]}"
-    
+
     @admin.display(
         description="Warc Files",
     )
     def get_warc_files(self, obj):
         return ", ".join(
-            f"{warc_file.warc_path} (ID: {warc_file.id})" for warc_file in obj.warc_files.all()
-        )
-
-    @admin.display(
-        description="Score Records",
-    )
-    def get_score_records(self, obj):
-        return ", ".join(
-            f"Score: {score_record.score} by {score_record.neuron.hotkey} (ID: {score_record.id})" for score_record in obj.score_records.all()
+            f"{warc_file.warc_path} (ID: {warc_file.id})"
+            for warc_file in obj.warc_files.all()
         )
 
 
@@ -102,14 +95,14 @@ class ScoreRecordAdmin(admin.ModelAdmin):
         "updated_at",
     )
     list_filter = ("created_at",)
-    search_fields = ("neuron__hotkey", "task_record__neuron__hotkey")
+    search_fields = ("validator__hotkey", "task_record__validator__hotkey")
     ordering = ("-created_at",)
 
     @admin.display(
         description="Validator Hotkey",
     )
     def validator_hotkey(self, obj):
-        hotkey = obj.neuron.hotkey
+        hotkey = obj.validator.hotkey
         return f"{hotkey[:5]}...{hotkey[-5:]}"
 
     @admin.display(

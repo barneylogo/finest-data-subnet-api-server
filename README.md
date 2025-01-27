@@ -104,3 +104,14 @@ The following details how to deploy this application.
 ### Docker
 
 See detailed [cookiecutter-django Docker documentation](https://cookiecutter-django.readthedocs.io/en/latest/3-deployment/deployment-with-docker.html).
+
+#### For backup init db
+docker ps
+docker cp init_db.init_db.sql <container_id>:/backup.dump
+docker exec -it <container_id> bash
+ps_restore -U finest -d subnet_api_server -f /backup.dump
+
+
+### Traefik
+
+Should change Host of compose/traefik/traefik.yaml as same domain to connect

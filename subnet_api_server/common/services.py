@@ -103,7 +103,7 @@ class BittensorService:
                     "stake": node.stake.tao,
                     "validator_trust": node.validator_trust,
                     "rank": node.rank,
-                    "incentive": node.incentive,
+                    "dividends": node.dividends,
                     "emission": node.emission,
                     "active": node.active,
                     "last_update": node.last_update,
