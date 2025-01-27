@@ -55,7 +55,7 @@ class NeuronAdmin(admin.ModelAdmin):
 @admin.register(TaskRecord)
 class TaskRecordAdmin(admin.ModelAdmin):
     list_display = (
-        "neuron_hotkey",
+        "miner_hotkey",
         "request_block",
         "status",
         "get_warc_files",
@@ -64,15 +64,15 @@ class TaskRecordAdmin(admin.ModelAdmin):
         "updated_at",
     )
     list_filter = ("status", "created_at")
-    search_fields = ("neuron__hotkey", "status")
+    search_fields = ("miner__hotkey", "status")
     ordering = ("-created_at",)
-    fields = ("neuron", "status", "request_block", "hf_repo")
+    fields = ("miner", "status", "request_block", "hf_repo")
 
     @admin.display(
-        description="Neuron Hotkey",
+        description="Miner Hotkey",
     )
-    def neuron_hotkey(self, obj):
-        hotkey = obj.neuron.hotkey
+    def miner_hotkey(self, obj):
+        hotkey = obj.miner.hotkey
         return f"{hotkey[:5]}...{hotkey[-5:]}"
 
     @admin.display(
@@ -95,14 +95,14 @@ class ScoreRecordAdmin(admin.ModelAdmin):
         "updated_at",
     )
     list_filter = ("created_at",)
-    search_fields = ("neuron__hotkey", "task_record__neuron__hotkey")
+    search_fields = ("validator__hotkey", "task_record__validator__hotkey")
     ordering = ("-created_at",)
 
     @admin.display(
         description="Validator Hotkey",
     )
     def validator_hotkey(self, obj):
-        hotkey = obj.neuron.hotkey
+        hotkey = obj.validator.hotkey
         return f"{hotkey[:5]}...{hotkey[-5:]}"
 
     @admin.display(

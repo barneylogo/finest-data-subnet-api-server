@@ -104,10 +104,10 @@ class GetScoresView(APIView):
 
             # Get the latest task record for each miner
             latest_task_records = (
-                TaskRecord.objects.select_related("neuron")
+                TaskRecord.objects.select_related("miner")
                 .filter(status=StatusEnum.completed.name)
-                .order_by("neuron", "-created_at")
-                .distinct("neuron")
+                .order_by("miner", "-created_at")
+                .distinct("miner")
             )
 
             if len(miners) == 0 or len(validators) == 0:
@@ -122,11 +122,11 @@ class GetScoresView(APIView):
 
             # Get scores for the latest task records
             for task_record in latest_task_records:
-                miner_neuron = task_record.neuron
+                miner_neuron = task_record.miner
                 score_records = ScoreRecord.objects.filter(task_record=task_record)
 
                 for score_record in score_records:
-                    validator_neuron = score_record.neuron
+                    validator_neuron = score_record.validator
                     scores[miner_neuron.uid][validator_neuron.uid] = score_record.score
 
             return Response(
