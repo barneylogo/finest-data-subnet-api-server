@@ -51,7 +51,7 @@ class Neuron(Common):
 
 
 class TaskRecord(Common):
-    neuron = models.ForeignKey(
+    miner = models.ForeignKey(
         Neuron,
         related_name="task_records_rel",  # Rename to avoid conflict
         on_delete=models.CASCADE,
@@ -73,10 +73,10 @@ class TaskRecord(Common):
 
 
 class ScoreRecord(Common):
-    neuron = models.ForeignKey(Neuron, on_delete=models.CASCADE)
+    validator = models.ForeignKey(Neuron, on_delete=models.CASCADE)
     task_record = models.ForeignKey(TaskRecord, on_delete=models.CASCADE)
     score = models.FloatField(blank=True, null=True)
 
     class Meta:
         db_table = "score_records"
-        unique_together = ("neuron", "task_record")
+        unique_together = ("validator", "task_record")

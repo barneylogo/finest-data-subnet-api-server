@@ -58,7 +58,7 @@ class GetTaskViewSet(APIView):
 
             existing_task = (
                 TaskRecord.objects.filter(
-                    neuron=neuron,
+                    miner=neuron,
                     status=StatusEnum.pending.name,
                 )
                 .order_by("-created_at")
@@ -79,7 +79,7 @@ class GetTaskViewSet(APIView):
 
             last_completed_task = (
                 TaskRecord.objects.filter(
-                    neuron=neuron,
+                    miner=neuron,
                     status=StatusEnum.completed.name,
                 )
                 .order_by("-request_block")
@@ -94,6 +94,7 @@ class GetTaskViewSet(APIView):
                     {"message": "You are limited to one task request per day"},
                     status=status.HTTP_404_NOT_FOUND,
                 )
+
             available_warc_files = WarcFile.objects.filter(
                 status=StatusEnum.available.name,
             ).order_by("?")[:4]
@@ -109,7 +110,7 @@ class GetTaskViewSet(APIView):
 
             [wf.pk for wf in available_warc_files]
             new_task = TaskRecord.objects.create(
-                neuron=neuron,
+                miner=neuron,
                 request_block=BittensorService.get_current_block(),
                 status=StatusEnum.pending.name,
             )
@@ -160,7 +161,7 @@ class FinishTaskViewSet(APIView):
                 )
 
             pending_task = TaskRecord.objects.filter(
-                neuron__hotkey=hotkey,
+                miner__hotkey=hotkey,
                 status=StatusEnum.pending.name,
             ).first()
 
@@ -204,7 +205,7 @@ class CheckTaskViewSet(APIView):
 
             completed_task = (
                 TaskRecord.objects.filter(
-                    neuron__uid=uid,
+                    miner__uid=uid,
                     status=StatusEnum.completed.name,
                 )
                 .order_by("-updated_at")
@@ -263,7 +264,7 @@ class ReportScoreViewSet(APIView):
             neuron = Neuron.objects.get(hotkey=hotkey)
 
             score_record, created = ScoreRecord.objects.get_or_create(
-                neuron=neuron,
+                validator=neuron,
                 task_record=task,
                 defaults={"score": score},
             )
