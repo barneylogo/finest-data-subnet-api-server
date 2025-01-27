@@ -65,13 +65,8 @@ class TaskRecord(Common):
         ],  # Correct choice tuple structure
         default=StatusEnum.pending.name,
     )
-    hf_repo = models.CharField(max_length=255, null=True, blank=True)
 
-    score_records = models.ManyToManyField(
-        'ScoreRecord',
-        related_name='task_records',
-        blank=True
-    )
+    hf_repo = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         db_table = "task_records"
