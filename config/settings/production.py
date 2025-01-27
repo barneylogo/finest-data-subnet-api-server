@@ -20,16 +20,12 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = env.list(
     "DJANGO_ALLOWED_HOSTS",
-    default=["finest-data-api.elevonix.io"],
+    default=["elevonix.io"],
 )
 
 CORS_ALLOWED_ORIGINS = env.list(
     "DJANGO_CORS_ALLOWED_ORIGINS",
-    default=[
-        "https://finest-data.elevonix.io",
-        "https://elevonix.io",
-        "https://finest-data-ui.vercel.app",
-    ],
+    default=["https://elevonix.io"],
 )
 # DATABASES
 # ------------------------------------------------------------------------------
