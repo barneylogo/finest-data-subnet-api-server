@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 
 class CheckTaskRequestSerializer(serializers.Serializer):
-    uid = serializers.IntegerField()
+    uid = serializers.IntegerField(required=True)
 
 
 class CheckTaskResponseSerializer(serializers.Serializer):

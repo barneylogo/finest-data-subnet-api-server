@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from subnet_api_server.common.models import StatusEnum
 from subnet_api_server.common.services import BittensorService
 from subnet_api_server.subnets.models import ScoreRecord
 from subnet_api_server.subnets.models import TaskRecord
@@ -20,7 +21,33 @@ class GetValidatorsView(APIView):
                 examples=[
                     OpenApiExample(
                         "Example Response",
-                        value={"total": 3, "items": [1, 2, 3]},
+                        value={
+                            "total": 2,
+                            "items": [
+                                {
+                                    "uid": 0,
+                                    "hotkey": "5Ckr36PvmVU78dQXwVSkhy1dXrh4ZaUD8Y5Q9qjjHK7reJXq",
+                                    "stake": 33797.542431213,
+                                    "validator_trust": 0.9999847409781033,
+                                    "rank": 0,
+                                    "incentive": 0,
+                                    "emission": 40.24940512,
+                                    "active": True,
+                                    "last_update": 3679701,
+                                },
+                                {
+                                    "uid": 1,
+                                    "hotkey": "5Cvzo77XcAUnHipqWos5SQr8uLUD9ndKykj9565PgE3MW4jW",
+                                    "stake": 776.224946983,
+                                    "validator_trust": 0.9999847409781033,
+                                    "rank": 0,
+                                    "incentive": 0,
+                                    "emission": 40.24940512,
+                                    "active": True,
+                                    "last_update": 3679701,
+                                },
+                            ],
+                        },
                         response_only=True,
                     ),
                 ],
@@ -41,9 +68,9 @@ class GetValidatorsView(APIView):
             )
 
 
-class GetWeightsView(APIView):
+class GetScoresView(APIView):
     @extend_schema(
-        description="Get all weights.",
+        description="Retrieve scores for each miner's most recent completed task.",
         responses={
             200: OpenApiResponse(
                 response=OpenApiTypes.OBJECT,
@@ -51,12 +78,13 @@ class GetWeightsView(APIView):
                     OpenApiExample(
                         "Example Response",
                         value={
-                            "validators": [1, 2, 3],
-                            "miners": [1, 2, 3],
-                            "weights": {
-                                1: {1: 1, 2: 2, 3: 3},
-                                2: {1: 1, 2: 2, 3: 3},
-                                3: {1: 1, 2: 2, 3: 3},
+                            "validators": [0, 3],
+                            "miners": [1, 2, 4, 5],
+                            "scores": {
+                                1: {0: 3320, 3: 1150},
+                                2: {3: 2238},
+                                4: {0: 2384},
+                                5: {0: 3215, 3: 2178},
                             },
                         },
                         response_only=True,
@@ -71,12 +99,13 @@ class GetWeightsView(APIView):
             validators = BittensorService.get_validators()
             validator_uids = [validator["uid"] for validator in validators]
 
-            # Initialize weights dictionary
-            weights = {miner["uid"]: {} for miner in miners}
+            # Initialize scores dictionary
+            scores = {miner["uid"]: {} for miner in miners}
 
             # Get the latest task record for each miner
             latest_task_records = (
                 TaskRecord.objects.select_related("neuron")
+                .filter(status=StatusEnum.completed.name)
                 .order_by("neuron", "-created_at")
                 .distinct("neuron")
             )
@@ -86,7 +115,7 @@ class GetWeightsView(APIView):
                     {
                         "validators": validator_uids,
                         "miners": miners,
-                        "weights": weights,
+                        "scores": scores,
                     },
                     status=status.HTTP_200_OK,
                 )
@@ -94,14 +123,14 @@ class GetWeightsView(APIView):
             # Get scores for the latest task records
             for task_record in latest_task_records:
                 miner_neuron = task_record.neuron
-                scores = ScoreRecord.objects.filter(task_record=task_record)
+                score_records = ScoreRecord.objects.filter(task_record=task_record)
 
-                for score_record in scores:
+                for score_record in score_records:
                     validator_neuron = score_record.neuron
-                    weights[miner_neuron.uid][validator_neuron.uid] = score_record.score
+                    scores[miner_neuron.uid][validator_neuron.uid] = score_record.score
 
             return Response(
-                {"validators": validator_uids, "miners": miners, "weights": weights},
+                {"validators": validator_uids, "miners": miners, "scores": scores},
                 status=status.HTTP_200_OK,
             )
         except Exception as e:
