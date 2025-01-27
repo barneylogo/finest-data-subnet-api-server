@@ -31,11 +31,10 @@ class TaskRecordResponseSerializer(serializers.ModelSerializer):
 
 class ScoresResponseSerializer(serializers.ModelSerializer):
     validator = NeuronSerializer(read_only=True)
-    task_record = TaskRecordResponseSerializer(read_only=True)
 
     class Meta:
         model = ScoreRecord
-        fields = "__all__"
+        fields = ["validator", "score", "created_at"]
 
 
 class TaskRecordRequestSerializer(serializers.Serializer):

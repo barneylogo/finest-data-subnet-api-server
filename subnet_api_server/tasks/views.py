@@ -59,16 +59,16 @@ class GetScoresByTaskView(APIView):
             if count is not None:
                 count = int(count)
 
-            scores = (
+            score_records = (
                 ScoreRecord.objects.select_related("task_record")
                 .select_related("validator")
                 .filter(task_record_id=task_id)
                 .order_by("-created_at")
             )
             if count:
-                scores = scores[:count]
+                score_records = score_records[:count]
 
-            serialized_scores = ScoresResponseSerializer(scores).data
+            serialized_scores = ScoresResponseSerializer(score_records, many=True).data
             return Response(
                 {
                     "total": len(serialized_scores),
