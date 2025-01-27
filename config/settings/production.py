@@ -25,7 +25,11 @@ ALLOWED_HOSTS = env.list(
 
 CORS_ALLOWED_ORIGINS = env.list(
     "DJANGO_CORS_ALLOWED_ORIGINS",
-    default=["https://finest-data.elevonix.io", "https://elevonix.io"],
+    default=[
+        "https://finest-data.elevonix.io",
+        "https://elevonix.io",
+        "https://finest-data-ui.vercel.app",
+    ],
 )
 # DATABASES
 # ------------------------------------------------------------------------------
