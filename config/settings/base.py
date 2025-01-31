@@ -311,6 +311,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "subnet_api_server.subnets.tasks.mark_stale_tasks_as_failed",
         "schedule": crontab(minute="*/30"),
     },
+    "updating-neuron": {
+        "task": "subnet_api_server.subnets.tasks.update_neuron",
+        "schedule": crontab(minute="*/60"),
+    },
 }
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#worker-send-task-events
 CELERY_WORKER_SEND_TASK_EVENTS = True

@@ -33,3 +33,7 @@ jsonschema-specifications==2024.10.1  # https://github.com/Julian/jsonschema-spe
 referencing==0.35.1  # https://github.com/Julian/referencing
 rpds-py==0.22.3  # https://github.com/jazzband/rpds-py
 uritemplate==4.1.1  # https://github.com/gruns/uritemplate.py
+
+# -----------------------------------------------------------------
+
+bs4==0.0.2
