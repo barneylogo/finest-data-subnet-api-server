@@ -46,11 +46,16 @@ def update_neuron():
         for uid in metagraph.uids:
             hotkey = metagraph.hotkeys[uid]
             coldkey = metagraph.coldkeys[uid]
-            new_neuron = Neuron.objects.create(
-                uid=int(uid),
-                hotkey=hotkey,
-                coldkey=coldkey,
-            )
-            print(f"Added neuron: {new_neuron.uid}")
+
+            if not Neuron.objects.filter(hotkey=hotkey).exists():
+                new_neuron = Neuron.objects.create(
+                    uid=int(uid),
+                    hotkey=hotkey,
+                    coldkey=coldkey,
+                )
+                print(f"Added neuron: {new_neuron.uid}")
+            else:
+                print(f"Neuron with hotkey {hotkey} already exists.")
+
     except Exception as e:
         print(str(e))
