@@ -272,19 +272,19 @@ class ReportScoreViewSet(APIView):
             task = TaskRecord.objects.get(pk=task_id)
             
             try:
-                metagraph = BittensorService.get_metagraph()
-                neuron = next((n for n in metagraph.neurons if n.hotkey == hotkey), None)
+                validators = BittensorService.get_validators()
+                validator = next((v for v in validators if v["hotkey"] == hotkey), None)
 
-                if not neuron:
+                if not validator:
                     return Response(
-                        {"message": "Validator's hotkey is not registered."},
+                        {"message": "Validator is not registered or has sufficient stake to set weights on the subnet."},
                         status=status.HTTP_404_NOT_FOUND,
                     )
                 
                 neuron_instance, _ = Neuron.objects.update_or_create(
-                    hotkey=neuron.hotkey,
-                    uid=neuron.uid,
-                    coldkey=neuron.coldkey,
+                    hotkey=validator["hotkey"],
+                    uid=validator["uid"],
+                    coldkey=validator["coldkey"],
                 )
 
             except Exception as e:
