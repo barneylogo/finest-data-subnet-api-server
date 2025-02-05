@@ -99,6 +99,7 @@ class BittensorService:
             return [
                 {
                     "uid": node.uid,
+                    "coldkey":node.coldkey,
                     "hotkey": node.hotkey,
                     "stake": node.stake.tao,
                     "validator_trust": node.validator_trust,

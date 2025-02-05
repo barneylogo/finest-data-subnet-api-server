@@ -338,16 +338,6 @@ SOCIALACCOUNT_ADAPTER = "subnet_api_server.users.adapters.SocialAccountAdapter"
 # https://docs.allauth.org/en/latest/socialaccount/configuration.html
 SOCIALACCOUNT_FORMS = {"signup": "subnet_api_server.users.forms.UserSocialSignupForm"}
 
-
-# Bittensor
-# ------------------------------------------------------------------------------
-BITTENSOR_NETWORK = env("BITTENSOR_NETWORK", default="test")
-BITTENSOR_NETWORK_UID = env("BITTENSOR_NETWORK_UID", default=250)
-BITTENSOR_VALIDATOR_STAKE_THRESHOLD = env(
-    "BITTENSOR_VALIDATOR_STAKE_THRESHOLD",
-    default=10,
-)
-
 # Documentation (Swagger)
 # ------------------------------------------------------------------------------
 CORS_URLS_REGEX = r"^/api/.*$"
@@ -374,5 +364,5 @@ BITTENSOR_NETWORK = env("BITTENSOR_NETWORK", default="test")
 BITTENSOR_NETWORK_UID = env("BITTENSOR_NETWORK_UID", default=250)
 BITTENSOR_VALIDATOR_STAKE_THRESHOLD = env(
     "BITTENSOR_VALIDATOR_STAKE_THRESHOLD",
-    default=10,
-)
+    default=10, 
+) 

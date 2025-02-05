@@ -22,7 +22,7 @@ django-celery-beat==2.7.0  # https://github.com/celery/django-celery-beat
 
 # Bittensor
 # ------------------------------------------------------------------------------
-bittensor
+bittensor==8.5.1  
 
 # Spectacular
 # ------------------------------------------------------------------------------
@@ -33,3 +33,7 @@ jsonschema-specifications==2024.10.1  # https://github.com/Julian/jsonschema-spe
 referencing==0.35.1  # https://github.com/Julian/referencing
 rpds-py==0.22.3  # https://github.com/jazzband/rpds-py
 uritemplate==4.1.1  # https://github.com/gruns/uritemplate.py
+
+# Other
+
+bs4==0.0.2  # https://github.com/python/cpython/tree/3.12/Lib/html/parser.py
