@@ -89,7 +89,7 @@ class GetTaskViewSet(APIView):
 
             last_completed_task = (
                 TaskRecord.objects.filter(
-                    miner=neuron,
+                    miner=neuron_instance,
                     status=StatusEnum.completed.name,
                 )
                 .order_by("-request_block")
@@ -120,7 +120,7 @@ class GetTaskViewSet(APIView):
 
             [wf.pk for wf in available_warc_files]
             new_task = TaskRecord.objects.create(
-                miner=neuron,
+                miner=neuron_instance,
                 request_block=BittensorService.get_current_block(),
                 status=StatusEnum.pending.name,
             )
