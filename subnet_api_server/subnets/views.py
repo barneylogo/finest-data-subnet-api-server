@@ -57,7 +57,7 @@ class GetTaskViewSet(APIView):
                         status=status.HTTP_404_NOT_FOUND,
                     )
                 
-                Neuron.objects.update_or_create(
+                neuron_instance, _ = Neuron.objects.update_or_create(
                     hotkey=neuron.hotkey,
                     uid=neuron.uid,
                     coldkey=neuron.coldkey,
@@ -68,7 +68,7 @@ class GetTaskViewSet(APIView):
 
             existing_task = (
                 TaskRecord.objects.filter(
-                    miner=neuron,
+                    miner=neuron_instance,
                     status=StatusEnum.pending.name,
                 )
                 .order_by("-created_at")
