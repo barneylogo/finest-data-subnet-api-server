@@ -277,7 +277,7 @@ class ReportScoreViewSet(APIView):
 
                 if not validator:
                     return Response(
-                        {"message": "Validator is not registered or has sufficient stake to set weights on the subnet."},
+                        {"message": "Validator is not registered or has insufficient stake to set weights on the subnet."},
                         status=status.HTTP_404_NOT_FOUND,
                     )
                 
