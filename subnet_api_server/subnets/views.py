@@ -48,17 +48,27 @@ class GetTaskViewSet(APIView):
                 )
 
             try:
-                neuron = Neuron.objects.get(hotkey=hotkey)
+                metagraph = BittensorService.get_metagraph()
+                neuron = next((n for n in metagraph.neurons if n.hotkey == hotkey), None)
 
-            except Neuron.DoesNotExist:
-                return Response(
-                    {"detail": "Hotkey not found."},
-                    status=status.HTTP_404_NOT_FOUND,
+                if not neuron:
+                    return Response(
+                        {"message": "Miner's hotkey is not registered."},
+                        status=status.HTTP_404_NOT_FOUND,
+                    )
+                
+                neuron_instance, _ = Neuron.objects.update_or_create(
+                    hotkey=neuron.hotkey,
+                    uid=neuron.uid,
+                    coldkey=neuron.coldkey,
                 )
+
+            except Exception as e:
+                return Response({"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             existing_task = (
                 TaskRecord.objects.filter(
-                    miner=neuron,
+                    miner=neuron_instance,
                     status=StatusEnum.pending.name,
                 )
                 .order_by("-created_at")
@@ -79,7 +89,7 @@ class GetTaskViewSet(APIView):
 
             last_completed_task = (
                 TaskRecord.objects.filter(
-                    miner=neuron,
+                    miner=neuron_instance,
                     status=StatusEnum.completed.name,
                 )
                 .order_by("-request_block")
@@ -110,7 +120,7 @@ class GetTaskViewSet(APIView):
 
             [wf.pk for wf in available_warc_files]
             new_task = TaskRecord.objects.create(
-                miner=neuron,
+                miner=neuron_instance,
                 request_block=BittensorService.get_current_block(),
                 status=StatusEnum.pending.name,
             )
@@ -128,8 +138,7 @@ class GetTaskViewSet(APIView):
             return Response(task_serializer.data, status=status.HTTP_200_OK)
 
         except Exception as e:
-            return Response({"message": str(e)}, status=500)
-
+            return Response({"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class FinishTaskViewSet(APIView):
     @extend_schema(
@@ -261,10 +270,28 @@ class ReportScoreViewSet(APIView):
                 return Response({"message": "Invalid signature"}, status=400)
 
             task = TaskRecord.objects.get(pk=task_id)
-            neuron = Neuron.objects.get(hotkey=hotkey)
+            
+            try:
+                validators = BittensorService.get_validators()
+                validator = next((v for v in validators if v["hotkey"] == hotkey), None)
+
+                if not validator:
+                    return Response(
+                        {"message": "Validator is not registered or has insufficient stake to set weights on the subnet."},
+                        status=status.HTTP_404_NOT_FOUND,
+                    )
+                
+                neuron_instance, _ = Neuron.objects.update_or_create(
+                    hotkey=validator["hotkey"],
+                    uid=validator["uid"],
+                    coldkey=validator["coldkey"],
+                )
+
+            except Exception as e:
+                return Response({"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             score_record, created = ScoreRecord.objects.get_or_create(
-                validator=neuron,
+                validator=neuron_instance,
                 task_record=task,
                 defaults={"score": score},
             )

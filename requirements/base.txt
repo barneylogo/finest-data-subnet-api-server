@@ -22,7 +22,7 @@ django-celery-beat==2.7.0  # https://github.com/celery/django-celery-beat
 
 # Bittensor
 # ------------------------------------------------------------------------------
-bittensor
+bittensor==8.5.1
 
 # Spectacular
 # ------------------------------------------------------------------------------
@@ -36,4 +36,6 @@ uritemplate==4.1.1  # https://github.com/gruns/uritemplate.py
 
 # -----------------------------------------------------------------
 
-bs4==0.0.2
+# Other
+# ------------------------------------------------------------------------------
+bs4==0.0.2  # https://github.com/python/cpython/tree/3.12/Lib/html/parser.py
