@@ -58,7 +58,7 @@ class BittensorService:
     def get_metagraph() -> bt.metagraph:
         try:
             config = BittensorService.get_config()
-            subtensor = BittensorService.get_subtensor()
+            subtensor = bt.subtensor(network=settings.BITTENSOR_NETWORK, config=config)
             return subtensor.metagraph(netuid=config.netuid)
         except Exception as e:
             raise RuntimeError(f"Failed to get metagraph: {e}") from e
@@ -99,7 +99,7 @@ class BittensorService:
             return [
                 {
                     "uid": node.uid,
-                    "coldkey":node.coldkey,
+                    "coldkey": node.coldkey,
                     "hotkey": node.hotkey,
                     "stake": node.stake.tao,
                     "validator_trust": node.validator_trust,
@@ -132,7 +132,7 @@ class BittensorService:
                 if node.trust > 0 and node.incentive > 0
             ]
         except Exception as e:
-            raise RuntimeError(f"Failed to get validators: {e}") from e
+            raise RuntimeError(f"Failed to get miners: {e}") from e
 
     @staticmethod
     def get_subnet_stats():

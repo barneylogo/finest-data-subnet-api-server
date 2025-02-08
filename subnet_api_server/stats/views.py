@@ -97,40 +97,45 @@ class GetScoresView(APIView):
         try:
             miners = BittensorService.get_miners()
             validators = BittensorService.get_validators()
+            miner_uids = [miner["uid"] for miner in miners]
             validator_uids = [validator["uid"] for validator in validators]
 
-            # Initialize scores dictionary
-            scores = {miner["uid"]: {} for miner in miners}
-
-            # Get the latest task record for each miner
+            # Get the latest completed task record for each miner
             latest_task_records = (
-                TaskRecord.objects.select_related("miner")
-                .filter(status=StatusEnum.completed.name)
+                TaskRecord.objects.filter(
+                    status=StatusEnum.completed.name, miner__uid__in=miner_uids
+                )
+                .select_related("miner")
                 .order_by("miner", "-created_at")
                 .distinct("miner")
             )
 
-            if len(miners) == 0 or len(validators) == 0:
-                return Response(
-                    {
-                        "validators": validator_uids,
-                        "miners": miners,
-                        "scores": scores,
-                    },
-                    status=status.HTTP_200_OK,
+            # Retrieve scores for the latest task records
+            score_records = (
+                ScoreRecord.objects.filter(
+                    task_record__in=latest_task_records,
+                    validator__uid__in=validator_uids,
                 )
+                .select_related("task_record__miner", "validator")
+                .values("task_record__miner__uid", "validator__uid", "score")
+            )
 
-            # Get scores for the latest task records
-            for task_record in latest_task_records:
-                miner_neuron = task_record.miner
-                score_records = ScoreRecord.objects.filter(task_record=task_record)
-
-                for score_record in score_records:
-                    validator_neuron = score_record.validator
-                    scores[miner_neuron.uid][validator_neuron.uid] = score_record.score
+            # Organize scores into the desired format
+            scores = {}
+            for record in score_records:
+                miner_uid = record["task_record__miner__uid"]
+                validator_uid = record["validator__uid"]
+                score = record["score"]
+                if miner_uid not in scores:
+                    scores[miner_uid] = {}
+                scores[miner_uid][validator_uid] = score
 
             return Response(
-                {"validators": validator_uids, "miners": miners, "scores": scores},
+                {
+                    "validators": list(validator_uids),
+                    "miners": list(miners),
+                    "scores": scores,
+                },
                 status=status.HTTP_200_OK,
             )
         except Exception as e:
