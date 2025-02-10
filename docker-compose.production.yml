@@ -12,8 +12,11 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
-
+      args:
+        - BUILD_ENVIRONMENT=${BUILD_ENVIRONMENT:-testnet}
     image: subnet_api_server_production_django
+    environment:
+      - BUILD_ENVIRONMENT=${BUILD_ENVIRONMENT:-testnet}
     depends_on:
       - postgres
       - redis
@@ -48,7 +51,6 @@ services:
       - '0.0.0.0:80:80'
       - '0.0.0.0:443:443'
       - '0.0.0.0:5555:5555'
-
   redis:
     image: docker.io/redis:6
 

@@ -1,0 +1,7 @@
+# PRECAUTION: avoid production dependencies that aren't in development
+
+-r production.txt
+
+# Bittensor
+# ------------------------------------------------------------------------------
+bittensor==8.5.1  # https://github.com/opentensor/bittensor
