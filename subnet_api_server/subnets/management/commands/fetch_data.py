@@ -19,7 +19,9 @@ class Command(BaseCommand):
     command_help = "Fetches data and commits it to the database"
 
     def handle(self, *args, **kwargs):
-        self.fetch_neuron()
+        self.fetch_crawl()
+        self.fetch_warc_files()
+        # self.fetch_neuron()
 
     def fetch_crawl(self):
         url = "https://index.commoncrawl.org/collinfo.json"

@@ -43,19 +43,22 @@ def update_neuron():
         subtensor = BittensorService.get_subtensor()
         metagraph = subtensor.metagraph(netuid=config.netuid)
 
-        for uid in metagraph.uids:
-            hotkey = metagraph.hotkeys[uid]
-            coldkey = metagraph.coldkeys[uid]
+        current_uids = {node.uid for node in metagraph.neurons}
 
-            if not Neuron.objects.filter(hotkey=hotkey).exists():
-                new_neuron = Neuron.objects.create(
-                    uid=int(uid),
-                    hotkey=hotkey,
-                    coldkey=coldkey,
-                )
-                print(f"Added neuron: {new_neuron.uid}")
-            else:
-                print(f"Neuron with hotkey {hotkey} already exists.")
+        # Update or create neurons in the database
+        for node in metagraph.neurons:
+            uid = node.uid
+            hotkey = node.hotkey
+            coldkey = node.coldkey
+
+            Neuron.objects.update_or_create(
+                uid=uid,
+                hotkey=hotkey,
+                coldkey=coldkey,
+            )
+
+        # Delete neurons not present in the current metagraph
+        Neuron.objects.exclude(uid__in=current_uids).delete()
 
     except Exception as e:
         print(str(e))

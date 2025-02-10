@@ -5,7 +5,8 @@ FROM docker.io/python:3.10.12-slim-bookworm AS python
 # Python build stage
 FROM python AS python-build-stage
 
-ARG BUILD_ENVIRONMENT=production
+
+ARG BUILD_ENVIRONMENT
 
 # Install apt packages
 RUN apt-get update && apt-get install --no-install-recommends -y \
