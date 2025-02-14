@@ -4,5 +4,5 @@
 
 # Bittensor
 # ------------------------------------------------------------------------------
-bittensor==9.0.0rc5  # https://github.com/opentensor/bittensor
+bittensor==9.0.0  # https://github.com/opentensor/bittensor
 substrate-interface==1.7.11
