@@ -4,4 +4,5 @@
 
 # Bittensor
 # ------------------------------------------------------------------------------
-bittensor==8.5.1  # https://github.com/opentensor/bittensor
+bittensor==9.0.0  # https://github.com/opentensor/bittensor
+substrate-interface==1.7.11
