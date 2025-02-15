@@ -1,0 +1,8 @@
+# PRECAUTION: avoid production dependencies that aren't in development
+
+-r production.txt
+
+# Bittensor
+# ------------------------------------------------------------------------------
+bittensor==9.0.0  # https://github.com/opentensor/bittensor
+substrate-interface==1.7.11

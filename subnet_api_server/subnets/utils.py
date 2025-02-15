@@ -2,7 +2,6 @@ from binascii import unhexlify
 
 from substrateinterface import Keypair
 
-
 def verify_signature(hotkey: str, message: str, signature: str) -> bool:
     try:
         keypair = Keypair(ss58_address=hotkey, ss58_format=42)
